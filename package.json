@@ -1,0 +1,26 @@
+{
+  "name": "bundl1",
+  "version": "0.0.0",
+  "description": "Initial frame to bundl1 project",
+  "main": "index.js",
+  "dependencies": {
+    "express": "^4.12.2",
+    "facebook-node-sdk": "^0.2.0",
+    "fs": "0.0.2",
+    "sanitizer": "^0.1.2"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/projectbundl/bundl1"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/projectbundl/bundl1/issues"
+  },
+  "homepage": "https://github.com/projectbundl/bundl1"
+}
