@@ -1,98 +1,104 @@
 // set variables for environment
 var express = require('express');
 var path = require('path');
-var fbgraph = require('fbgraph');
+var graph = require('fbgraph');
 var Facebook = require('facebook-node-sdk');
 var fs = require('fs');
-var bodyparser = require('bodyparser');
 
 var app = express();
 
-var exp = express();
-
+//this should really be in a config file!
 var conf = {
-  client_id: '417015361805687',
-  redirect_uri: 'http://localhost:3000/auth/facebook'
+		client_id: '417015361805687',
+		client_secret: '63e069e235f6430eebe6991813614090',
+	 scope: 'email, user_about_me, user_birthday, user_location, publish_stream',
+		  redirect_uri: 'http://babbage.hbg.psu.edu:6395/auth/facebook',
+};
+
+var options = {
+  timeout: 3000,
+  pool: { maxSockets: Infinity },
+  headers: {connection: "keep-alive"}
 };
 
 
-  //app.set('views', __dirname + '/views');
-  //app.set('view engine', 'jade');
-	exp.use(bodyparser.json());
-	exp.use(express.methodOverride());
-	exp.use(app.router);
-	exp.use(express.static(__dirname + '/public'));
+app.set('view engine', 'html');
+app.use(express.static(path.join(__dirname, 'public')));
 
-
-exp.configure('development', function(){
-	exp.use(express.errorHandler({ dumpExceptions: true, showStack: true }));
+app.get('/', function(req, res){
+	res.render("index.html", { title: "click link to connect" });
 });
 
-exp.configure('production', function(){
-	exp.use(express.errorHandler());
-});
+app.get('/auth/facebook', function(req, res) {
 
+//	we don't have a code yet
+//	so we'll redirect to the oauth dialog
+	if (!req.query.code) {
+		var authUrl = graph.getOauthUrl({
+			"client_id":     conf.client_id
+			, "redirect_uri":  conf.redirect_uri
+			, "scope":         conf.scope
+		});
 
-exp.get('/', function(req, res){
-  res.render("index", { title: "click link to connect" });
-});
+		if (!req.query.error) { //checks whether a user denied the app facebook login/permissions
+			res.redirect(authUrl);
+		} else {  //req.query.error == 'access_denied'
+			res.send('access denied');
+		}
+		return;
+	}
 
+var BUser = { 'bid',
+        'bemail',
+        'bfirst_name',
+        'bname' };
 
-exp.get('/auth/facebook', function(req, res) {
-
-  // we don't have a code yet
-  // so we'll redirect to the oauth dialog
-  if (!req.query.code) {
-    var authUrl = fbgraph.getOauthUrl({
-        "client_id":     conf.client_id
-      , "redirect_uri":  conf.redirect_uri
-    });
-
-    if (!req.query.error) { //checks whether a user denied the app facebook login/permissions
-      res.redirect(authUrl);
-    } else {  //req.query.error == 'access_denied'
-      res.send('access denied');
-    }
-    return;
-  }
-
-  // code is set
-  // we'll send that and get the access token
-  fbgraph.authorize({
-      "client_id":      conf.client_id
-    , "redirect_uri":   conf.redirect_uri
-    , "code":           req.query.code
-  }, function (err, facebookRes) {
-    res.redirect('/UserHasLoggedIn');
-  });
-
-
-});
-
-// user gets sent here after being authorized
-exp.get('/UserHasLoggedIn', function(req, res) {
-  res.render("index", { title: "Logged In" });
-});
-
-
-//var app = express.createServer();
-//
-//app.configure(function() {
-//  app.use(express.bodyParser());
-//  app.use(express.cookieParser());
-//  app.use(express.session({ secret: 'foo bar' }));
-//  app.use(Facebook.middleware({ appId: '417015361805687'}));
+//	code is set
+//	we'll send that and get the access token
+	graph.authorize({
+		"client_id":      conf.client_id
+		, "redirect_uri":   conf.redirect_uri
+		, "client_secret":  conf.client_secret
+		, "code":           req.query.code
+	}, function (err, facebookRes) {
+// Get users Posts and display on main
+//graph.get("Bundl Man", function(err, res) {
+//  console.log("HI");
+//  if (err) console.log(err);
+//  console.log(res);
 //});
-//
-//app.get('/', Facebook.loginRequired(), function(req, res) {
-//
-//});
+//console.log("me: " + JSON.stringify(me()));
+var query = "Select name from user where uid = me()";
+graph.get('/me', function(err, res) {
+  BUser.bname = res.name;
+  BUser.bfirst_name = res.first_name;
+  BUser.bid = res.id;
+  BUser.bemail = res.email;
+  res.redirect('/main.html'); // Create BUser and output values in querystring
+});
+	});
 
-var port = process.env.PORT || 3000;
-exp.listen(port, function() {
-  console.log("Express server listening on port %d", port);
+
 });
 
+//user gets sent here after being authorized
+app.get('/main.html', function(req, res) {
+graph.setOptions(options).get("Bundl Man", function(err, res) {
+        if (err) console.log('error: ' + JSON.stringify(err));
+        console.log('success: ' + JSON.stringify(res));
+});
+res.render("index", { title: "Logged In" });
+});
+
+
+var port = 3000;
+//var port = process.env.PORT || 22;
+app.listen(port, function() {
+console.log("Express server listening on port %d", port);
+});
+
+
+//var app = express();
 
 //// Set server port
 //app.get('/', function(req, res) {
