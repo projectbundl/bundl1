@@ -12,7 +12,7 @@ var conf = {
 		client_id: '417015361805687',
 		client_secret: '63e069e235f6430eebe6991813614090',
 	 scope: 'email, user_about_me, user_birthday, user_location, publish_stream',
-		  redirect_uri: 'http://babbage.hbg.psu.edu:6395/auth/facebook',
+		  redirect_uri: 'http://babbage.hbg.psu.edu:6395/main.html',
 };
 
 var options = {
@@ -29,7 +29,12 @@ app.get('/', function(req, res){
 	res.render("index.html", { title: "click link to connect" });
 });
 
-app.get('/auth/facebook', function(req, res) {
+var BUser = { 'bid':"",
+        'bemail':"",
+        'bfirst_name':"",
+        'bname':"" };
+
+app.get('/auth/facebook', function(req, res, err) {
 
 //	we don't have a code yet
 //	so we'll redirect to the oauth dialog
@@ -39,7 +44,8 @@ app.get('/auth/facebook', function(req, res) {
 			, "redirect_uri":  conf.redirect_uri
 			, "scope":         conf.scope
 		});
-
+if (err)
+    console.log(conf.redirect_uri);
 		if (!req.query.error) { //checks whether a user denied the app facebook login/permissions
 			res.redirect(authUrl);
 		} else {  //req.query.error == 'access_denied'
@@ -48,10 +54,6 @@ app.get('/auth/facebook', function(req, res) {
 		return;
 	}
 
-var BUser = { 'bid',
-        'bemail',
-        'bfirst_name',
-        'bname' };
 
 //	code is set
 //	we'll send that and get the access token
