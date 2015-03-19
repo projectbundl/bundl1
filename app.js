@@ -1,13 +1,9 @@
 // set variables for environment
-var express = require('express');
-var path = require('path');
-var graph = require('fbgraph');
-var Facebook = require('facebook-node-sdk');
-var creds = require("./creds");
-var passport = require('passport');
-var engine = require('consolidate');
-
 var express = require('express')
+  , path = require('path')
+  , graph = require('fbgraph')
+  , creds = require("./creds")
+  , engine = require('consolidate')
   , passport = require('passport')
   , util = require('util')
   , FacebookStrategy = require('passport-facebook').Strategy
@@ -19,6 +15,25 @@ var express = require('express')
 
 var FACEBOOK_APP_ID = creds.fb.id;
 var FACEBOOK_APP_SECRET = creds.fb.secret;
+
+// Express Configuration
+var app = express();
+app.use(express.static(path.join(__dirname, 'public')));
+app.set('view engine', '.html');
+app.use(passport.initialize());
+app.use(passport.session());
+// configure Express
+/*
+  app.set('views', __dirname + '/views');
+  app.set('view engine', 'ejs');
+  app.use(logger());
+  app.use(cookieParser());
+  app.use(bodyParser());
+  app.use(methodOverride());
+  app.use(session({ secret: 'keyboard cat' }));
+  */
+  // Initialize Passport!  Also use passport.session() middleware, to support
+  // persistent login sessions (recommended).
 
 
 // Passport session setup.
@@ -44,19 +59,23 @@ passport.deserializeUser(function(obj, done) {
 passport.use(new FacebookStrategy({
     clientID: FACEBOOK_APP_ID,
     clientSecret: FACEBOOK_APP_SECRET,
-    callbackURL: "http://babbage.hbg.psu.edu:6395/auth/facebook/callback"
-    , profileFields: ['id', 'displayName', 'photos']
+    callbackURL: "http://babbage.hbg.psu.edu:6395/auth/facebook/callback",
+    scope: ['publish_stream','read_stream', 'publish_actions', 'public_profile']
   },
   function(accessToken, refreshToken, profile, done) {
     // asynchronous verification, for effect...
     process.nextTick(function () {
-      
             graph.setAccessToken(accessToken);
+            
             graph.get('/me', function(err, res) {
                console.log(res);
                return done(null, profile);
             });
-            console.log(profile);
+
+            //postToFeedMessageAccessToken("This is a test3", accessToken);
+            pullFromFeedAccessTokenUserID(accessToken, profile.id);
+            //console.log(output);
+            //console.log(profile);
             console.log(accessToken.length);
       // To keep the example simple, the user's Facebook profile is returned to
       // represent the logged-in user.  In a typical application, you would want
@@ -67,34 +86,12 @@ passport.use(new FacebookStrategy({
   }
 ));
 
-var app = express();
-app.use(express.static(path.join(__dirname, 'public')));
-//app.set('views', __dirname + '/views');
-//app.engine('html', engine.mustache);
-app.set('view engine', '.html');
 
-// configure Express
-/*
-  app.set('views', __dirname + '/views');
-  app.set('view engine', 'ejs');
-  app.use(logger());
-  app.use(cookieParser());
-  app.use(bodyParser());
-  app.use(methodOverride());
-  app.use(session({ secret: 'keyboard cat' }));
-  */
-  // Initialize Passport!  Also use passport.session() middleware, to support
-  // persistent login sessions (recommended).
-  app.use(passport.initialize());
-  app.use(passport.session());
-//  app.use(express.static(__dirname + '/public'));
-
-
-
-
-app.get('/main', ensureAuthenticated, function(req, res){
-  console.log();
-  gr
+app.get('/main',  function(req, res){
+  console.log(graph.getAccessToken());
+  if (graph.getAccessToken() == "") 
+    res.render('/index.html');
+else
   res.render('/main.html');
 });
 
@@ -137,8 +134,8 @@ app.get('/logout', function(req, res){
 });
 
 app.listen(3000, function() {
-         console.log("Express server listening on port 3000");
-         });
+  console.log("Express server listening on port 3000");
+});
 
 
 // Simple route middleware to ensure user is authenticated.
@@ -151,8 +148,28 @@ function ensureAuthenticated(req, res, next) {
   res.redirect('/login')
 }
 
-/*
+var postToFeedMessageAccessToken = function (mess, accessToken) {
+  graph.setAccessToken(accessToken);
+  var temp = {message:mess};
+  graph.post("/me/feed", temp , function(err, res) {
+    console.log(res);
+  });
+};
 
+var output = new Array();
+var pullFromFeedAccessTokenUserID = function (accessToken, userID) {
+  graph.setAccessToken(accessToken);
+  var post = "/" + userID + "/posts";
+  graph.get("/" + userID + '/posts', function (err, res) {
+    for (var i in res.data) {
+      output.push({message:res.data[i].message, name:res.data[i].from.name});      
+      console.log(res.data[i].message);
+      console.log(res.data[i].from.name);
+    }
+  });
+};
+
+/*
 var User = function(uid, fname) {
   this.userid = uid;
   this.firstname = fname;
@@ -163,59 +180,6 @@ User.prototype.str = function() {
   return "userid=" + this.userid + "&username=" + this.firstname;
 };
 
-var app = express();
-var conf = {
-  client_id: creds.fb.id,
-	client_secret: creds.fb.secret,
-  scope: 'email, user_about_me, user_birthday, user_location, publish_stream',
-  redirect_uri: 'https://babbage.hbg.psu.edu:6395/main.html',
-};
-
-var options = {
-  timeout: 3000,
-  pool: { maxSockets: Infinity },
-  headers: {connection: "keep-alive"}
-};
-
-
-app.set('view engine', 'html');
-app.use(express.static(path.join(__dirname, 'public')));
-
-app.get('/', function(req, res){
-	res.render("index.html", { title: "click link to connect" });
-});
-
-var BUser = { 'bid':"",
-        'bemail':"",
-        'bfirst_name':"",
-        'bname':"" };
-
-
-app.get('/auth/facebook', function(req, res, err) {
-//	we don't have a code yet
-//	so we'll redirect to the oauth dialog
-	if (!req.query.code) {
-		var authUrl = graph.getOauthUrl({
-			"client_id":    creds.fb.id
-			, "redirect_uri":  conf.redirect_uri
-			, "scope":         conf.scope
-		});
-	};
-
-  graph.getLoginStatus(function(res) {
-    res.redirect(authUrl);
-
-//	code is set
-//	we'll send that and get the access token
-	graph.authorize({
-		"client_id":      creds.fb.id
-		, "redirect_uri":   conf.redirect_uri
-		, "client_secret":  creds.fb.secret
-		, "code":           req.query.code
-	}, function (err, facebookRes) {
-  graph.setAccessToken();
-  console.log(facebookRes);
-  
 
 
 // Get users Posts and display on main
@@ -238,11 +202,6 @@ graph.get('/me', function(err, res) {
 });
 });
 
-		//if (!req.query.error) { //checks whether a user denied the app facebook login/permissions
-		//	res.redirect(authUrl);
-		//} else {  //req.query.error == 'access_denied'
-		//	res.send('access denied');
-		//}
 
 //user gets sent here after being authorized
 app.get('/main.html', function(req, res) {
@@ -252,12 +211,5 @@ graph.setOptions(options).get("Bundl Man", function(err, res) {
         console.log('success: ' + JSON.stringify(res));
 });
 res.render("index", { title: "Logged In" });
-});
-
-
-var port = 3000;
-//var port = process.env.PORT || 22;
-app.listen(port, function() {
-console.log("Express server listening on port %d", port);
 });
 */
