@@ -1,5 +1,6 @@
 // set variables for environment
 var express = require('express')
+  , ejs = require('ejs')
   , path = require('path')
   , graph = require('fbgraph')
   , creds = require("./creds")
@@ -18,10 +19,36 @@ var FACEBOOK_APP_SECRET = creds.fb.secret;
 
 // Express Configuration
 var app = express();
-app.use(express.static(path.join(__dirname, 'public')));
-app.set('view engine', '.html');
+app.use(express.static(__dirname + '/public'));
+app.use(express.static(__dirname + '/views'));
+app.set('view engine', 'jade');
 app.use(passport.initialize());
 app.use(passport.session());
+
+var sessionStore = session({secret:"ssh!!", cookie:{maxAge:3600000}, resave: true, saveUninitialized: true});
+app.use(sessionStore);
+
+app.use(function(req, res, next) {
+  console.log('%s %s', req.method, req.url);
+  var err = req.session.error, msg = req.session.notice, success = req.session.success;
+
+  delete req.session.error;
+  delete req.session.success;
+  delete req.session.notice;
+
+  if (err) res.locals.error = err;
+  if (msg) res.locals.notice = msg;
+  if (success) res.locals.success = success;
+
+  next();
+});
+
+//app.use(express.static(path.join(__dirname, '/public')));
+//app.use(express.static(path.join(__dirname, '/views')));
+//app.engine('html',require('ejs').renderFile);
+//app.register('.html', require('jade'));
+//app.set('view engine', 'ejs');
+//app.set('view engine', '.html');
 // configure Express
 /*
   app.set('views', __dirname + '/views');
@@ -57,6 +84,7 @@ passport.deserializeUser(function(obj, done) {
 //   credentials (in this case, an accessToken, refreshToken, and Facebook
 //   profile), and invoke a callback with a user object.
 passport.use(new FacebookStrategy({
+    passReqToCallBack: true,
     clientID: FACEBOOK_APP_ID,
     clientSecret: FACEBOOK_APP_SECRET,
     callbackURL: "http://babbage.hbg.psu.edu:6395/auth/facebook/callback",
@@ -65,18 +93,19 @@ passport.use(new FacebookStrategy({
   function(accessToken, refreshToken, profile, done) {
     // asynchronous verification, for effect...
     process.nextTick(function () {
-            graph.setAccessToken(accessToken);
+
+      graph.setAccessToken(accessToken);
             
-            graph.get('/me', function(err, res) {
-               console.log(res);
-               return done(null, profile);
-            });
+      graph.get('/me', function(err, res) {
+               //console.log(res);
+      return done(null, profile);
+      });
 
             //postToFeedMessageAccessToken("This is a test3", accessToken);
-            pullFromFeedAccessTokenUserID(accessToken, profile.id);
+      //pullFromFeedAccessTokenUserID(accessToken, profile.id);
             //console.log(output);
             //console.log(profile);
-            console.log(accessToken.length);
+      console.log(accessToken.length);
       // To keep the example simple, the user's Facebook profile is returned to
       // represent the logged-in user.  In a typical application, you would want
       // to associate the Facebook account with a user record in your database,
@@ -87,11 +116,15 @@ passport.use(new FacebookStrategy({
 ));
 
 
-app.get('/main',  function(req, res){
-  console.log(graph.getAccessToken());
-  if (graph.getAccessToken() == "") 
-    res.render('/index.html');
-else
+
+app.use('/post', function(req, res) {
+  console.log("post");
+  res.render('post.jade', {index:{test: "Yay!!!"}});
+});
+
+app.use('/main',  function(req, res){
+  //req.session.
+  console.log("here");
   res.render('/main.html');
 });
 
@@ -109,11 +142,14 @@ app.get('/loginForm', function(req, res){
 //   redirecting the user to facebook.com.  After authorization, Facebook will
 //   redirect the user back to this application at /auth/facebook/callback
 app.get('/auth/facebook',
-  passport.authenticate('facebook'), 
+  passport.authenticate('facebook'), function(req, res) {});  
+/*
   function(req, res){
     // The request will be redirected to Facebook for authentication, so this
     // function will not be called.
-  });
+  }
+});
+*/
 
 // GET /auth/facebook/callback
 //   Use passport.authenticate() as route middleware to authenticate the
@@ -121,13 +157,9 @@ app.get('/auth/facebook',
 //   login page.  Otherwise, the primary route function function will be called,
 //   which, in this example, will redirect the user to the home page.
 app.get('/auth/facebook/callback', 
-  passport.authenticate('facebook', { failureRedirect: '/login' , successRedirect: '/main.html'}));
-/*
-  function(req, res) {
-          console.log("in callback");
-  })
-  );
-*/
+   passport.authenticate('facebook', { failureRedirect: '/login', successRedirect:'/main.html'}));
+
+
 app.get('/logout', function(req, res){
   req.logout();
   res.redirect('/');
@@ -152,7 +184,7 @@ var postToFeedMessageAccessToken = function (mess, accessToken) {
   graph.setAccessToken(accessToken);
   var temp = {message:mess};
   graph.post("/me/feed", temp , function(err, res) {
-    console.log(res);
+    //console.log(res);
   });
 };
 
@@ -162,12 +194,28 @@ var pullFromFeedAccessTokenUserID = function (accessToken, userID) {
   var post = "/" + userID + "/posts";
   graph.get("/" + userID + '/posts', function (err, res) {
     for (var i in res.data) {
+      if (res.data[i].comments) {
+        console.log(res.data[i].comments.data[0].message);
+        //console.log(res.data[i].comments);
+      }
+      if (res.data[i].message == "Put a comment under this post~") {
+        commentToPost("This is a second reply", res.data[i].id);
+      }
       output.push({message:res.data[i].message, name:res.data[i].from.name});      
-      console.log(res.data[i].message);
-      console.log(res.data[i].from.name);
+      //console.log(res.data[i].message);
+      //console.log(res.data[i].from.name
     }
+    return res;
   });
 };
+
+
+var commentToPost = function (message, postID) {
+  graph.post("/" + postID + "/comments", {'message':message}, function(err, res) {
+    console.log(res);
+  });
+}
+
 
 /*
 var User = function(uid, fname) {
