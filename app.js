@@ -93,37 +93,43 @@ passport.use(new FacebookStrategy({
   function(accessToken, refreshToken, profile, done) {
     // asynchronous verification, for effect...
     process.nextTick(function () {
-
+      /*
       graph.setAccessToken(accessToken);
             
       graph.get('/me', function(err, res) {
                //console.log(res);
-      return done(null, profile);
+      return done(null, profile, accessToken);
       });
-
+      */
             //postToFeedMessageAccessToken("This is a test3", accessToken);
       //pullFromFeedAccessTokenUserID(accessToken, profile.id);
             //console.log(output);
             //console.log(profile);
-      console.log(accessToken.length);
+      //console.log(accessToken.length);
       // To keep the example simple, the user's Facebook profile is returned to
       // represent the logged-in user.  In a typical application, you would want
       // to associate the Facebook account with a user record in your database,
       // and return that user instead.
-      //return done(null, profile);
+      //next(profile, accessToken);
+      passport.accessToken = accessToken;
+      passport.me = profile.id;
+      return done(null, profile);
     });
   }
 ));
 
-
-
 app.use('/post', function(req, res) {
-  console.log("post");
-  res.render('post.jade', {index:{test: "Yay!!!"}});
-});
+  var temp = req.query.them;
+  //console.log(temp);
+  pullAllPosts(passport.accessToken, passport.me, callback)
 
+function callback(facebook){
+  facebook = JSON.stringify(facebook);
+  postToFeedMessageAccessToken(temp, passport.accessToken);
+  res.render('post.jade', {index:{test: facebook}});
+}
+});
 app.use('/main',  function(req, res){
-  //req.session.
   console.log("here");
   res.render('/main.html');
 });
@@ -192,7 +198,7 @@ var output = new Array();
 var pullFromFeedAccessTokenUserID = function (accessToken, userID) {
   graph.setAccessToken(accessToken);
   var post = "/" + userID + "/posts";
-  graph.get("/" + userID + '/posts', function (err, res) {
+  graph.get(post, function (err, res) {
     for (var i in res.data) {
       if (res.data[i].comments) {
         console.log(res.data[i].comments.data[0].message);
@@ -206,6 +212,16 @@ var pullFromFeedAccessTokenUserID = function (accessToken, userID) {
       //console.log(res.data[i].from.name
     }
     return res;
+  });
+};
+
+
+var pullAllPosts = function(accessToken, userID, callback) {
+  graph.setAccessToken(accessToken);
+  var post = "/" + userID + "/posts";
+  graph.get(post, function(err, res) {
+    //console.log(res);
+    callback(res);
   });
 };
 
