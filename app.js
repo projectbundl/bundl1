@@ -17,6 +17,7 @@ var express = require('express')
 var FACEBOOK_APP_ID = creds.fb.id;
 var FACEBOOK_APP_SECRET = creds.fb.secret;
 
+
 // Express Configuration
 var app = express();
 app.use(express.static(__dirname + '/public'));
@@ -24,10 +25,13 @@ app.use(express.static(__dirname + '/views'));
 app.set('view engine', 'jade');
 app.use(passport.initialize());
 app.use(passport.session());
+//app.use(cookieParser());
 
 var sessionStore = session({secret:"ssh!!", cookie:{maxAge:3600000}, resave: true, saveUninitialized: true});
 app.use(sessionStore);
 
+
+// Log all server requests
 app.use(function(req, res, next) {
   console.log('%s %s', req.method, req.url);
   var err = req.session.error, msg = req.session.notice, success = req.session.success;
@@ -42,22 +46,10 @@ app.use(function(req, res, next) {
 
   next();
 });
-
-//app.use(express.static(path.join(__dirname, '/public')));
-//app.use(express.static(path.join(__dirname, '/views')));
-//app.engine('html',require('ejs').renderFile);
-//app.register('.html', require('jade'));
-//app.set('view engine', 'ejs');
-//app.set('view engine', '.html');
 // configure Express
 /*
-  app.set('views', __dirname + '/views');
-  app.set('view engine', 'ejs');
-  app.use(logger());
-  app.use(cookieParser());
   app.use(bodyParser());
   app.use(methodOverride());
-  app.use(session({ secret: 'keyboard cat' }));
   */
   // Initialize Passport!  Also use passport.session() middleware, to support
   // persistent login sessions (recommended).
@@ -93,24 +85,14 @@ passport.use(new FacebookStrategy({
   function(accessToken, refreshToken, profile, done) {
     // asynchronous verification, for effect...
     process.nextTick(function () {
-      /*
-      graph.setAccessToken(accessToken);
-            
-      graph.get('/me', function(err, res) {
-               //console.log(res);
-      return done(null, profile, accessToken);
-      });
-      */
-            //postToFeedMessageAccessToken("This is a test3", accessToken);
-      //pullFromFeedAccessTokenUserID(accessToken, profile.id);
-            //console.log(output);
-            //console.log(profile);
-      //console.log(accessToken.length);
+     
       // To keep the example simple, the user's Facebook profile is returned to
       // represent the logged-in user.  In a typical application, you would want
       // to associate the Facebook account with a user record in your database,
       // and return that user instead.
-      //next(profile, accessToken);
+      
+      // Can create our own cookie after user validation/ combine social media info from db
+      // http://zipplease.tumblr.com/post/34169331215/node-js-session-management-with-express
       passport.accessToken = accessToken;
       passport.me = profile.id;
       return done(null, profile);
@@ -118,18 +100,19 @@ passport.use(new FacebookStrategy({
   }
 ));
 
-app.use('/post', function(req, res) {
+
+app.use('/post', ensureAuthenticated, function(req, res) {
   var temp = req.query.them;
   //console.log(temp);
   pullAllPosts(passport.accessToken, passport.me, callback)
 
-function callback(facebook){
-  facebook = JSON.stringify(facebook);
-  postToFeedMessageAccessToken(temp, passport.accessToken);
-  res.render('post.jade', {index:{test: facebook}});
-}
+  function callback(facebook){
+    facebook = JSON.stringify(facebook);
+     postToFeedMessageAccessToken(temp, passport.accessToken);
+     res.render('post.jade', {index:{test: facebook}});
+  }
 });
-app.use('/main',  function(req, res){
+app.use('/main', ensureAuthenticated, function(req, res){
   console.log("here");
   res.render('/main.html');
 });
@@ -149,13 +132,7 @@ app.get('/loginForm', function(req, res){
 //   redirect the user back to this application at /auth/facebook/callback
 app.get('/auth/facebook',
   passport.authenticate('facebook'), function(req, res) {});  
-/*
-  function(req, res){
-    // The request will be redirected to Facebook for authentication, so this
-    // function will not be called.
-  }
-});
-*/
+
 
 // GET /auth/facebook/callback
 //   Use passport.authenticate() as route middleware to authenticate the
@@ -203,10 +180,10 @@ var pullFromFeedAccessTokenUserID = function (accessToken, userID) {
       if (res.data[i].comments) {
         console.log(res.data[i].comments.data[0].message);
         //console.log(res.data[i].comments);
-      }
+       }
       if (res.data[i].message == "Put a comment under this post~") {
         commentToPost("This is a second reply", res.data[i].id);
-      }
+       }
       output.push({message:res.data[i].message, name:res.data[i].from.name});      
       //console.log(res.data[i].message);
       //console.log(res.data[i].from.name
@@ -232,7 +209,6 @@ var commentToPost = function (message, postID) {
   });
 }
 
-
 /*
 var User = function(uid, fname) {
   this.userid = uid;
@@ -243,8 +219,6 @@ var User = function(uid, fname) {
 User.prototype.str = function() {
   return "userid=" + this.userid + "&username=" + this.firstname;
 };
-
-
 
 // Get users Posts and display on main
 //graph.get("Bundl Man", function(err, res) {
@@ -264,16 +238,5 @@ graph.get('/me', function(err, res) {
   });
 });
 });
-});
-
-
-//user gets sent here after being authorized
-app.get('/main.html', function(req, res) {
-        console.log("there");
-graph.setOptions(options).get("Bundl Man", function(err, res) {
-        if (err) console.log('error: ' + JSON.stringify(err));
-        console.log('success: ' + JSON.stringify(res));
-});
-res.render("index", { title: "Logged In" });
 });
 */
