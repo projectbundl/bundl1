@@ -124,7 +124,6 @@ app.use('/main', function(req, res){
   pullAllPosts(passport.accessToken, passport.me, callback)
    
   function callback(facebook){
-    facebook = JSON.stringify(facebook);
     postToFeedMessageAccessToken(temp, passport.accessToken);
     res.render('post', {index:{test: facebook}});
   }
@@ -168,7 +167,7 @@ app.get('/auth/facebook',
 //   login page.  Otherwise, the primary route function function will be called,
 //   which, in this example, will redirect the user to the home page.
 app.get('/auth/facebook/callback', 
-   passport.authenticate('facebook', { failureRedirect: '/login', successRedirect:'/main.html'}));
+   passport.authenticate('facebook', { failureRedirect: '/login', successRedirect:'/main'}));
 
 
 app.get('/logout', function(req, res){
