@@ -101,22 +101,46 @@ passport.use(new FacebookStrategy({
 ));
 
 
-app.use('/post', ensureAuthenticated, function(req, res) {
+app.use('/post', function(req, res) {
   var temp = req.query.them;
   //console.log(temp);
+  /*
   pullAllPosts(passport.accessToken, passport.me, callback)
 
   function callback(facebook){
     facebook = JSON.stringify(facebook);
      postToFeedMessageAccessToken(temp, passport.accessToken);
-     res.render('post.jade', {index:{test: facebook}});
+     res.render('post', {index:{test: facebook}});
   }
-});
-app.use('/main', ensureAuthenticated, function(req, res){
-  console.log("here");
-  res.render('/main.html');
+  */
 });
 
+app.use('/main', function(req, res){
+  console.log("here");
+  var temp = req.query.them;
+  pullAllPosts(passport.accessToken, passport.me, callback)
+   
+  function callback(facebook){
+    facebook = JSON.stringify(facebook);
+    postToFeedMessageAccessToken(temp, passport.accessToken);
+    res.render('post', {index:{test: facebook}});
+  }
+  res.render('main');
+});
+
+app.use('/postInfo', function(req, res) {
+  res.render('postInfo');
+});
+
+app.use('/reply', function(req, res) {
+  res.render('reply');
+});
+
+app.use('/index', function(req, res) {
+  res.render('index');
+});
+
+/*
 app.get('/account', ensureAuthenticated, function(req, res){
   res.render('account', { user: req.user });
 });
@@ -124,6 +148,7 @@ app.get('/account', ensureAuthenticated, function(req, res){
 app.get('/loginForm', function(req, res){
   res.render('loginForm.html', { user: req.user });
 });
+*/
 
 // GET /auth/facebook
 //   Use passport.authenticate() as route middleware to authenticate the
@@ -160,7 +185,7 @@ app.listen(3000, function() {
 //   login page.
 function ensureAuthenticated(req, res, next) {
   if (req.isAuthenticated()) { return next(); }
-  res.redirect('/login')
+  res.redirect('index')
 }
 
 var postToFeedMessageAccessToken = function (mess, accessToken) {
