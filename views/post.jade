@@ -2,8 +2,6 @@ doctype html
 head
   title BUNDL Post
     |   
-    link(rel='stylesheet', href='./css/postPage.css')
-    |   
     header
   body
     center
@@ -46,3 +44,12 @@ head
         img(src='./images/post.png', alt='Post')
         |     
         form
+      - for (var i=0; i<index.test.length; i++)
+          p  POST ##{i+1}
+          |  ID: #{index.test[i].postID}
+          br
+          |  AUTHOR: #{index.test[i].author}
+          br
+          |  MESSAGE: #{index.test[i].message}
+          br
+          |  TIME: #{index.test[i].time}

@@ -12,6 +12,7 @@ var express = require('express')
   , session = require('express-session')
   , bodyParser = require("body-parser")
   , cookieParser = require("cookie-parser")
+  , fbParser = require('./FBparse.js')
   , methodOverride = require('method-override');
 
 var FACEBOOK_APP_ID = creds.fb.id;
@@ -104,15 +105,17 @@ passport.use(new FacebookStrategy({
 app.use('/post', function(req, res) {
   var temp = req.query.them;
   //console.log(temp);
-  /*
+  
   pullAllPosts(passport.accessToken, passport.me, callback)
 
   function callback(facebook){
-    facebook = JSON.stringify(facebook);
-     postToFeedMessageAccessToken(temp, passport.accessToken);
-     res.render('post', {index:{test: facebook}});
+    //facebook = JSON.stringify(facebook);
+    postToFeedMessageAccessToken(temp, passport.accessToken);
+    facebook = fbParser(facebook);
+    //console.log(facebook);
+    res.render('post', {index:{test: facebook}});
   }
-  */
+  
 });
 
 app.use('/main', function(req, res){
