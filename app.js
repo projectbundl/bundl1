@@ -33,6 +33,7 @@ app.use(sessionStore);
 
 
 // Log all server requests
+
 app.use(function(req, res, next) {
   console.log('%s %s', req.method, req.url);
   var err = req.session.error, msg = req.session.notice, success = req.session.success;
@@ -102,24 +103,20 @@ passport.use(new FacebookStrategy({
 ));
 
 
-app.use('/post', function(req, res) {
+app.use('/post', ensureAuthenticated, function(req, res) {
   var temp = req.query.them;
-  //console.log(temp);
   
   pullAllPosts(passport.accessToken, passport.me, callback)
 
   function callback(facebook){
-    //facebook = JSON.stringify(facebook);
     postToFeedMessageAccessToken(temp, passport.accessToken);
     facebook = fbParser(facebook);
-    //console.log(facebook);
     res.render('post', {index:{test: facebook}});
   }
   
 });
 
-app.use('/main', function(req, res){
-  console.log("here");
+app.use('/main', ensureAuthenticated, function(req, res){
   var temp = req.query.them;
   pullAllPosts(passport.accessToken, passport.me, callback)
    
@@ -127,30 +124,20 @@ app.use('/main', function(req, res){
     postToFeedMessageAccessToken(temp, passport.accessToken);
     //res.render('post', {index:{test: facebook}});
   }
-  res.render('main');
+  //res.render('main');
 });
 
-app.use('/postInfo', function(req, res) {
+app.use('/postInfo', ensureAuthenticated, function(req, res) {
   res.render('postInfo');
 });
 
-app.use('/reply', function(req, res) {
+app.use('/reply', ensureAuthenticated, function(req, res) {
   res.render('reply');
 });
 
 app.use('/index', function(req, res) {
   res.render('index');
 });
-
-/*
-app.get('/account', ensureAuthenticated, function(req, res){
-  res.render('account', { user: req.user });
-});
-
-app.get('/loginForm', function(req, res){
-  res.render('loginForm.html', { user: req.user });
-});
-*/
 
 // GET /auth/facebook
 //   Use passport.authenticate() as route middleware to authenticate the
@@ -167,12 +154,12 @@ app.get('/auth/facebook',
 //   login page.  Otherwise, the primary route function function will be called,
 //   which, in this example, will redirect the user to the home page.
 app.get('/auth/facebook/callback', 
-   passport.authenticate('facebook', { failureRedirect: '/login', successRedirect:'/main'}));
+   passport.authenticate('facebook', { failureRedirect: '/index', successRedirect:'/main'}));
 
 
 app.get('/logout', function(req, res){
   req.logout();
-  res.redirect('/');
+  res.redirect('/index');
 });
 
 app.listen(3000, function() {
@@ -235,35 +222,3 @@ var commentToPost = function (message, postID) {
     console.log(res);
   });
 }
-
-/*
-var User = function(uid, fname) {
-  this.userid = uid;
-  this.firstname = fname;
-  console.log('Person instantiated');
-  console.log('username: ' + this.username);
-};
-User.prototype.str = function() {
-  return "userid=" + this.userid + "&username=" + this.firstname;
-};
-
-// Get users Posts and display on main
-//graph.get("Bundl Man", function(err, res) {
-//  console.log("HI");
-//  if (err) console.log(err);
-//  console.log(res);
-//});
-//console.log("me: " + JSON.stringify(me()));
-graph.get('/me', function(err, res) {
-        console.log(err);
-  var user1 = new User(res.id, res.name);
-//  BUser.bname = res.name;
-//  BUser.bfirst_name = res.first_name;
-//  BUser.bid = res.id;
-//  BUser.bemail = res.email;
-  res.redirect('/main.html?' + user1.str()); // Create BUser and output values in querystring
-  });
-});
-});
-});
-*/
