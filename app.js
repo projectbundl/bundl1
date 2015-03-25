@@ -103,7 +103,7 @@ passport.use(new FacebookStrategy({
 ));
 
 
-app.use('/post', ensureAuthenticated, function(req, res) {
+app.use('/post', function(req, res) {
   var temp = req.query.them;
   
   pullAllPosts(passport.accessToken, passport.me, callback)
@@ -116,7 +116,7 @@ app.use('/post', ensureAuthenticated, function(req, res) {
   
 });
 
-app.use('/main', ensureAuthenticated, function(req, res){
+app.use('/main', function(req, res){
   var temp = req.query.them;
   pullAllPosts(passport.accessToken, passport.me, callback)
    
@@ -124,14 +124,14 @@ app.use('/main', ensureAuthenticated, function(req, res){
     postToFeedMessageAccessToken(temp, passport.accessToken);
     //res.render('post', {index:{test: facebook}});
   }
-  //res.render('main');
+  res.render('main');
 });
 
-app.use('/postInfo', ensureAuthenticated, function(req, res) {
+app.use('/postInfo', function(req, res) {
   res.render('postInfo');
 });
 
-app.use('/reply', ensureAuthenticated, function(req, res) {
+app.use('/reply', function(req, res) {
   res.render('reply');
 });
 
