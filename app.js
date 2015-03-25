@@ -125,7 +125,7 @@ app.use('/main', function(req, res){
    
   function callback(facebook){
     postToFeedMessageAccessToken(temp, passport.accessToken);
-    res.render('post', {index:{test: facebook}});
+    //res.render('post', {index:{test: facebook}});
   }
   res.render('main');
 });
