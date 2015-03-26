@@ -20,39 +20,39 @@ head
         img(src='./images/twitterButton.png', alt='Navigate to Twitter')
       |     
       a(href='http://www.linkedin.com')
-        img(src='./images/linkedinButton.png', alt='Navigate to LinkedIn')
+        img(src='./images/linkedInButton.png', alt='Navigate to LinkedIn')
     |   
     section
       center
         br
-        |     
-        a(href='./postInfo')
-          img(src='./images/post2rep.png', alt='post2')
-          a
-            br
-            img(src='./images/post2.png', alt='post2')
-            br
-            img(src='./images/post2.png', alt='post2')
-            br
-            img(src='./images/post2.png', alt='post2')
-            br
-            img(src='./images/post2.png', alt='post2')
-            br
-            img(src='./images/post2.png', alt='post2')
-            br
-            img(src='./images/post2.png', alt='post2')
-            br
-            img(src='./images/post2.png', alt='post2')
-            br
-            img(src='./images/post2.png', alt='post2')
-            br
-            img(src='./images/post2.png', alt='post2')
-            br
-            img(src='./images/post2.png', alt='post2')
-            br
-            img(src='./images/post2.png', alt='post2')
-            br
-            img(src='./images/post2.png', alt='post2')
+        form
+        - for (var i=0; i<index.test.length; i++)
+           div.post
+             p  POST ##{i+1}
+             |  ID: #{index.test[i].postID}
+             br
+             |  AUTHOR: #{index.test[i].author}
+             br
+             |  MESSAGE: #{index.test[i].message}
+             br
+             |  TIME: #{index.test[i].time}
+             br
+             | COMMENT COUNT: #{index.test[i].commentCount}
+             - for (var j = 0; j < index.test[i].commentCount; j++)
+               div.comment
+                 p COMMENT ##{j+1}
+                 | ID: #{index.test[i].comments[j].postID}
+                 br
+                 | MESSAGE: #{index.test[i].comments[j].message} 
+                 br
+                 | AUTHOR: #{index.test[i].comments[j].author}
+           div.messageBox
+             form(method="post", action="/post")
+               input(type="text", value="#{index.test[i].postID}", name="id" hidden)
+               textarea(name="commentMessage")
+               div#submit
+                 input(type="submit", value="Submit")
     footer
     |   
     script(src='./js/mainPage.js')
+

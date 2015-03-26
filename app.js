@@ -21,6 +21,8 @@ var FACEBOOK_APP_SECRET = creds.fb.secret;
 
 // Express Configuration
 var app = express();
+app.use(bodyParser.urlencoded({extended:true}));
+app.use(bodyParser.json());
 app.use(express.static(__dirname + '/public'));
 app.use(express.static(__dirname + '/views'));
 app.set('view engine', 'jade');
@@ -102,29 +104,44 @@ passport.use(new FacebookStrategy({
   }
 ));
 
+app.route('/post')
+.get(function(req, res) {
+  res.render('post');
+})
+.post(function(req, res) {
+  if (req.body.postMessage) {
+    var postMessage = req.body.postMessage;
+    postToFeedMessageAccessToken(postMessage, passport.accessToken, callback);
 
-app.use('/post', function(req, res) {
-  var temp = req.query.them;
-  
-  pullAllPosts(passport.accessToken, passport.me, callback)
+    // Need to add if failure redirect
+    function callback(facebook){
+      res.redirect('main');
+    }
+  } else {
+    console.log(passport.accessToken);
+    var comment = req.body.commentMessage;
+    var id = req.body.id;
+    console.log(id);
+    commentToPost(comment, id, passport.accessToken, callback);
 
-  function callback(facebook){
-    postToFeedMessageAccessToken(temp, passport.accessToken);
-    facebook = fbParser(facebook);
-    res.render('post', {index:{test: facebook}});
+    function callback(facebook) {
+      res.redirect('main');
+    }
   }
   
 });
 
+app.use('/error', function(req, res) {
+  res.render('error');
+});
+
 app.use('/main', function(req, res){
-  var temp = req.query.them;
   pullAllPosts(passport.accessToken, passport.me, callback)
    
   function callback(facebook){
-    postToFeedMessageAccessToken(temp, passport.accessToken);
-    //res.render('post', {index:{test: facebook}});
+    facebook = fbParser(facebook);
+    res.render('main', {index:{test: facebook}});
   }
-  res.render('main');
 });
 
 app.use('/postInfo', function(req, res) {
@@ -138,6 +155,7 @@ app.use('/reply', function(req, res) {
 app.use('/index', function(req, res) {
   res.render('index');
 });
+
 
 // GET /auth/facebook
 //   Use passport.authenticate() as route middleware to authenticate the
@@ -159,7 +177,7 @@ app.get('/auth/facebook/callback',
 
 app.get('/logout', function(req, res){
   req.logout();
-  res.redirect('/index');
+  res.redirect('index');
 });
 
 app.listen(3000, function() {
@@ -177,32 +195,15 @@ function ensureAuthenticated(req, res, next) {
   res.redirect('index')
 }
 
-var postToFeedMessageAccessToken = function (mess, accessToken) {
+var postToFeedMessageAccessToken = function (mess, accessToken, callback) {
   graph.setAccessToken(accessToken);
-  var temp = {message:mess};
-  graph.post("/me/feed", temp , function(err, res) {
-    //console.log(res);
-  });
-};
-
-var output = new Array();
-var pullFromFeedAccessTokenUserID = function (accessToken, userID) {
-  graph.setAccessToken(accessToken);
-  var post = "/" + userID + "/posts";
-  graph.get(post, function (err, res) {
-    for (var i in res.data) {
-      if (res.data[i].comments) {
-        console.log(res.data[i].comments.data[0].message);
-        //console.log(res.data[i].comments);
-       }
-      if (res.data[i].message == "Put a comment under this post~") {
-        commentToPost("This is a second reply", res.data[i].id);
-       }
-      output.push({message:res.data[i].message, name:res.data[i].from.name});      
-      //console.log(res.data[i].message);
-      //console.log(res.data[i].from.name
+  var temp = {'message':mess};
+  graph.post("/feed", temp , function(err, res) {
+    if (res) {
+      callback(res);
+    } else {
+      console.log(err);
     }
-    return res;
   });
 };
 
@@ -211,14 +212,15 @@ var pullAllPosts = function(accessToken, userID, callback) {
   graph.setAccessToken(accessToken);
   var post = "/" + userID + "/posts";
   graph.get(post, function(err, res) {
-    //console.log(res);
     callback(res);
   });
 };
 
 
-var commentToPost = function (message, postID) {
+var commentToPost = function (message, postID, token, callback) {
+  graph.setAccessToken(token);
   graph.post("/" + postID + "/comments", {'message':message}, function(err, res) {
+    callback(res);
     console.log(res);
   });
 }

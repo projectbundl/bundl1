@@ -19,42 +19,36 @@ head
         img(src='./images/twitterButton.png', alt='Navigate to Twitter')
       |     
       a(href='http://www.linkedin.com')
-        img(src='./images/linkedinButton.png', alt='Navigate to LinkedIn')
+        img(src='./images/linkedInButton.png', alt='Navigate to LinkedIn')
     |   
     section
-      form
-        input(type='checkbox', name='sel', value='all')
-        | Select All
-        |       
-        input(type='checkbox', name='sel', value='facebook')
-        | Facebook
-        |       
-        input(type='checkbox', name='sel', value='google')
-        | Google+
-        |       
-        input(type='checkbox', name='sel', value='linkedin')
-        | LinkedIn
-        |       
-        input(type='checkbox', name='sel', value='twitter')
-        | Twitter
+      center
+       form
+          input(type='checkbox', name='sel', value='all')
+          | Select All
+          |       
+          input(type='checkbox', name='sel', value='facebook')
+          | Facebook
+          |       
+          input(type='checkbox', name='sel', value='google')
+          | Google+
+          |       
+          input(type='checkbox', name='sel', value='linkedin')
+          | LinkedIn
+          |       
+          input(type='checkbox', name='sel', value='twitter')
+          | Twitter
+          br
+           
+          
+  center        
+    div.messageBox
+      form(method="post", action="/post") 
         br
-        |       
-        img(src='./images/post.png', alt='Post')
-        |     
-        form
-      - for (var i=0; i<index.test.length; i++)
-          p  POST ##{i+1}
-          |  ID: #{index.test[i].postID}
-          br
-          |  AUTHOR: #{index.test[i].author}
-          br
-          |  MESSAGE: #{index.test[i].message}
-          br
-          |  TIME: #{index.test[i].time}
-          br
-          | COMMENT COUNT: #{index.test[i].commentCount}
-          if index.test[i].commentCount>0
-            for comment in index.test[i].commentArray
-              p COMMENT ##{j+1}
-              | ID: #{comment.postID}
- 
+        br
+        textarea(name="postMessage", rows="10", cols="75")         
+        br
+        br
+        br
+        div#submit
+          input(type="submit", value="Submit!")  

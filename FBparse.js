@@ -8,7 +8,7 @@ module.exports = function (input){
   //console.log(aryMess);
   //console.log('working module data:');
   //console.log(input.length);  
-  console.log(input.data[0].comments.data);
+ // console.log(input.data[0].comments.data);
   for (var i in aryMess) {
     messageArray.push(new Post(aryMess[i]));
     //messageArray.push(input.data[i].message);
