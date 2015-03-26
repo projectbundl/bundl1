@@ -1,6 +1,5 @@
 // set variables for environment
 var express = require('express')
-  , ejs = require('ejs')
   , path = require('path')
   , graph = require('fbgraph')
   , creds = require("./creds")
@@ -8,6 +7,8 @@ var express = require('express')
   , passport = require('passport')
   , util = require('util')
   , FacebookStrategy = require('passport-facebook').Strategy
+  , TwitterStrategy = require('passport-twitter').Strategy
+  , OAuth2Strategy = require('passport-oauth').OAuth2Strategy
   , logger = require('morgan')
   , session = require('express-session')
   , bodyParser = require("body-parser")
@@ -17,7 +18,8 @@ var express = require('express')
 
 var FACEBOOK_APP_ID = creds.fb.id;
 var FACEBOOK_APP_SECRET = creds.fb.secret;
-
+var TWITTER_CONSUMER_KEY = creds.tw.id;
+var TWITTER_CONSUMER_SECRET = creds.tw.secret;
 
 // Express Configuration
 var app = express();
@@ -52,7 +54,6 @@ app.use(function(req, res, next) {
 });
 // configure Express
 /*
-  app.use(bodyParser());
   app.use(methodOverride());
   */
   // Initialize Passport!  Also use passport.session() middleware, to support
@@ -79,27 +80,45 @@ passport.deserializeUser(function(obj, done) {
 //   Strategies in Passport require a `verify` function, which accept
 //   credentials (in this case, an accessToken, refreshToken, and Facebook
 //   profile), and invoke a callback with a user object.
-passport.use(new FacebookStrategy({
-    passReqToCallBack: true,
-    clientID: FACEBOOK_APP_ID,
-    clientSecret: FACEBOOK_APP_SECRET,
-    callbackURL: "http://babbage.hbg.psu.edu:6395/auth/facebook/callback",
-    scope: ['publish_stream','read_stream', 'publish_actions', 'public_profile']
-  },
+passport.use('facebook', new FacebookStrategy({
+  passReqToCallBack: true,
+  clientID: FACEBOOK_APP_ID,
+  clientSecret: FACEBOOK_APP_SECRET,
+  callbackURL: "http://babbage.hbg.psu.edu:6395/auth/facebook/callback",
+  scope: ['publish_stream','read_stream', 'publish_actions', 'public_profile'] },
   function(accessToken, refreshToken, profile, done) {
     // asynchronous verification, for effect...
     process.nextTick(function () {
      
-      // To keep the example simple, the user's Facebook profile is returned to
-      // represent the logged-in user.  In a typical application, you would want
-      // to associate the Facebook account with a user record in your database,
-      // and return that user instead.
+    // To keep the example simple, the user's Facebook profile is returned to
+    // represent the logged-in user.  In a typical application, you would want
+    // to associate the Facebook account with a user record in your database,
+    // and return that user instead.
       
-      // Can create our own cookie after user validation/ combine social media info from db
-      // http://zipplease.tumblr.com/post/34169331215/node-js-session-management-with-express
-      passport.accessToken = accessToken;
-      passport.me = profile.id;
-      return done(null, profile);
+    // Can create our own cookie after user validation/ combine social media info from db
+    // http://zipplease.tumblr.com/post/34169331215/node-js-session-management-with-express
+    passport.fb = {'accessToken': accessToken, 'me':profile.id};
+    return done(null, profile);
+    });
+  }
+));
+
+passport.use('twitter', new TwitterStrategy({
+  consumerKey: TWITTER_CONSUMER_KEY,
+  consumerSecret: TWITTER_CONSUMER_SECRET,
+  callbackURL: "http://babbage.hbg.psu.edu:6395/auth/twitter/callback"
+  },
+  function(token, tokenSecret, profile, done) {
+    process.nextTick(function() {
+      console.log(token);
+      console.log(JSON.stringify(profile));
+    //User.findOrCreate(..., function(err, user) {
+      //if (err) { return done(err); }
+      
+      // lookup user in DB
+      passport.tw = {'accessToken': token, 'me':profile.id};
+      done(null, profile);
+    //});
     });
   }
 ));
@@ -111,7 +130,7 @@ app.route('/post')
 .post(function(req, res) {
   if (req.body.postMessage) {
     var postMessage = req.body.postMessage;
-    postToFeedMessageAccessToken(postMessage, passport.accessToken, callback);
+    postToFeedMessageAccessToken(postMessage, passport.fb.accessToken, callback);
 
     // Need to add if failure redirect
     function callback(facebook){
@@ -122,7 +141,7 @@ app.route('/post')
     var comment = req.body.commentMessage;
     var id = req.body.id;
     console.log(id);
-    commentToPost(comment, id, passport.accessToken, callback);
+    commentToPost(comment, id, passport.fb.accessToken, callback);
 
     function callback(facebook) {
       res.redirect('main');
@@ -136,7 +155,7 @@ app.use('/error', function(req, res) {
 });
 
 app.use('/main', function(req, res){
-  pullAllPosts(passport.accessToken, passport.me, callback)
+  pullAllPosts(passport.fb.accessToken, passport.fb.me, callback)
    
   function callback(facebook){
     facebook = fbParser(facebook);
@@ -152,19 +171,15 @@ app.use('/reply', function(req, res) {
   res.render('reply');
 });
 
-app.use('/index', function(req, res) {
-  res.render('index');
-});
-
 
 // GET /auth/facebook
 //   Use passport.authenticate() as route middleware to authenticate the
 //   request.  The first step in Facebook authentication will involve
 //   redirecting the user to facebook.com.  After authorization, Facebook will
 //   redirect the user back to this application at /auth/facebook/callback
-app.get('/auth/facebook',
-  passport.authenticate('facebook'), function(req, res) {});  
+app.get('/auth/facebook', passport.authenticate('facebook'), function(req, res) {});  
 
+app.get('/auth/twitter', passport.authenticate('twitter'), function(req, res) {});
 
 // GET /auth/facebook/callback
 //   Use passport.authenticate() as route middleware to authenticate the
@@ -174,14 +189,21 @@ app.get('/auth/facebook',
 app.get('/auth/facebook/callback', 
    passport.authenticate('facebook', { failureRedirect: '/index', successRedirect:'/main'}));
 
+app.get('/auth/twitter/callback', 
+  passport.authenticate('twitter', { successRedirect: '/main', failureRedirect: '/index' }));
+
 
 app.get('/logout', function(req, res){
   req.logout();
-  res.redirect('index');
+  res.render('index');
 });
 
 app.listen(3000, function() {
   console.log("Express server listening on port 3000");
+});
+
+app.use('/', function(req, res) {
+  res.render('index');
 });
 
 
@@ -195,7 +217,7 @@ function ensureAuthenticated(req, res, next) {
   res.redirect('index')
 }
 
-var postToFeedMessageAccessToken = function (mess, accessToken, callback) {
+var FBpostToFeedMessageAccessToken = function (mess, accessToken, callback) {
   graph.setAccessToken(accessToken);
   var temp = {'message':mess};
   graph.post("/feed", temp , function(err, res) {
