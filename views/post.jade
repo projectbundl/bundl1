@@ -22,33 +22,28 @@ head
         img(src='./images/linkedInButton.png', alt='Navigate to LinkedIn')
     |   
     section
-      center
-       form
-          input(type='checkbox', name='sel', value='0')
-          | Select All
-          |       
-          input(type='checkbox', name='sel', value='1')
-          | Facebook
-          |       
-          input(type='checkbox', name='sel', value='google')
-          | Google+
-          |       
-          input(type='checkbox', name='sel', value='linkedin')
-          | LinkedIn
-          |       
-          input(type='checkbox', name='sel', value='2')
-          | Twitter
-          br
-           
-          
-  center        
-    div.messageBox
-      form(method="post", action="/post") 
-        br
-        br
-        textarea(name="postMessage", rows="10", cols="75")         
-        br
-        br
-        br
-        div#submit
-          input(type="submit", value="Submit!")  
+      center        
+        div.messageBox
+          form(method="post", action="/post") 
+            input(type='checkbox', name='sel', value='0')
+            | Select All
+            |       
+            input(type='checkbox', name='sel', value='1')
+            | Facebook
+            |       
+            input(type='checkbox', name='sel', value='google')
+            | Google+
+            |       
+            input(type='checkbox', name='sel', value='linkedin')
+            | LinkedIn
+            |       
+            input(type='checkbox', name='sel', value='2')
+            | Twitter
+            br
+            br
+            textarea(name="postMessage", rows="10", cols="75")         
+            br
+            br
+            br
+            div#submit
+              input(type="submit", value="Submit!")  

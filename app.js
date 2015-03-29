@@ -42,7 +42,6 @@ app.use(passport.session());
 
 
 // Log all server requests
-
 app.use(function(req, res, next) {
   console.log('%s %s', req.method, req.url);
   var err = req.session.error, msg = req.session.notice, success = req.session.success;
@@ -57,13 +56,6 @@ app.use(function(req, res, next) {
 
   next();
 });
-// configure Express
-/*
-  app.use(methodOverride());
-  */
-  // Initialize Passport!  Also use passport.session() middleware, to support
-  // persistent login sessions (recommended).
-
 
 // Passport session setup.
 //   To support persistent login sessions, Passport needs to be able to
@@ -93,8 +85,6 @@ passport.use('twitter', new TwitterStrategy({
   },
   function(accessToken, tokenSecret, profile, done) {
     process.nextTick(function() {
-      //console.log(accessToken);
-      //console.log(JSON.stringify(profile));
       //User.findOrCreate(..., function(err, user) {
       //if (err) { return done(err); }
       
@@ -151,24 +141,64 @@ app.route('/post')
     if (req.body.postMessage) {
       // Ensure there is an access token for the SM that is having the social media post sent to
       var postMessage = req.body.postMessage;
+      var selection = req.body.sel;
 
-      if (passport._strategies.facebook._oauth2.hasOwnProperty('accessToken')) {
-        FBpostToFeedMessageAccessToken(postMessage, passport._strategies.facebook._oauth2.accessToken, fbcallback);
+      if (selection.find('0')) {
+        if (passport._strategies.facebook._oauth2.hasOwnProperty('accessToken') && passport._strategies.twitter._oauth.hasOwnProperty('accessToken')) {
+          // Submit post
+          var asyncSubmitPosts = [];
+          asyncSubmitPosts.push(function(fbAsyncCallback) {
+            FBpostToFeedMessageAccessToken(postMessage, passport._strategies.facebook._oauth2.accessToken, fbcallback);
 
-        // Need to add if failure redirect
-        function fbcallback(facebook){
-          res.redirect('main');
+            // Need to add if failure redirect
+            function fbcallback(facebook){
+              fbAsyncCallback();
+            }
+          });
+
+          asyncSubmitPosts.push(function(twAsyncCallback) {
+            // Submit post to Twitter
+            TWtweet(comment, passport._strategies.twitter._oauth.accessToken, passport._strategies.twitter._oauth.tokenSecret, twcallback);
+
+            // Need to add if failure redirect
+            function twcallback(response) {
+              twAsyncCallback();
+            }
+          });
+
+          async.parallel(asyncSubmitPosts, function() {
+            // Check if there were errors
+            res.redirect('main');
+          });
+        } else {
+          // unauthorized
         }
-      } if (passport._strategies.twitter._oauth.hasOwnProperty('accessToken')) {
-        var comment = req.body.postMessage;
-        var id = req.body.id;
+      } else if (selection.find('1')) {
+        if (passport._strategies.facebook._oauth2.hasOwnProperty('accessToken')) {
+          // Submit post to FB
+          FBpostToFeedMessageAccessToken(postMessage, passport._strategies.facebook._oauth2.accessToken, fbcallback);
 
-        TWtweet(comment, passport._strategies.twitter._oauth.accessToken, passport._strategies.twitter._oauth.tokenSecret, twcallback);
+          // Need to add if failure redirect
+          function fbcallback(facebook){
+            res.redirect('main');
+          }
+        } else {
+          // unauthorized
+        }
+      } else if (selection.find('2')) {
+        if (passport._strategies.twitter._oauth.hasOwnProperty('accessToken')) {
+          // Submit post to Twitter
+          TWtweet(comment, passport._strategies.twitter._oauth.accessToken, passport._strategies.twitter._oauth.tokenSecret, twcallback);
 
-        function twcallback(response) {
-          res.redirect('main');
+          // Need to add if failure redirect
+          function twcallback(response) {
+            res.redirect('main');
+          }
+        } else {
+          // unauthorzied
         }
       }
+    res.redirect('post');
     }
   });
 
