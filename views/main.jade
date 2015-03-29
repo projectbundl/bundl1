@@ -47,7 +47,7 @@ head
                  br
                  | AUTHOR: #{index.test[i].comments[j].author}
            div.messageBox
-             form(method="post", action="/post")
+             form(method="post", action="/bin/processComment")
                input(type="text", value="#{index.test[i].postID}", name="id" hidden)
                textarea(name="commentMessage")
                div#submit
