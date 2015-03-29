@@ -1,5 +1,6 @@
 // set variables for environment
 var express = require('express')
+  , async = require('async')
   , https = require('https')
   , path = require('path')
   , graph = require('fbgraph')
@@ -177,21 +178,56 @@ app.use('/error', function(req, res) {
 
 app.use('/main', function(req, res){
   // Have both tokens combine post data
-  //if (passport._strategies.facebook._oauth2.hasOwnProperty('accessToken') && passport._strategies.twitter._oauth.hasOwnProperty('accessToken'))
-  if(passport._strategies.facebook._oauth2.hasOwnProperty('accessToken')) {
-    FBpullAllPosts(passport._strategies.facebook._oauth2.accessToken, passport._strategies.facebook._oauth2.profileID, fbcallback)
-     
-    function fbcallback(facebook){
-      facebook = fbParser(facebook);
-      res.render('main', {index:{test: facebook}});
-    } 
-  } 
-  else if (passport._strategies.twitter._oauth.hasOwnProperty('accessToken'))  {
-    TWpullAllTweets(passport._strategies.twitter._oauth.accessToken, passport._strategies.twitter._oauth.tokenSecret, twcallback);
+  if (passport._strategies.facebook._oauth2.hasOwnProperty('accessToken') && passport._strategies.twitter._oauth.hasOwnProperty('accessToken')) {
+    var facebookResults;
+    var twitterResults;
+    // Array to hold async tasks
+    var asyncTasks = [];
+    
+    // Push, pull FB post to async tasks
+    asyncTasks.push(function(fbasynccallback) {
+      FBpullAllPosts(passport._strategies.facebook._oauth2.accessToken, passport._strategies.facebook._oauth2.profileID, fbcallback)
+       
+      function fbcallback(facebook){
+        facebookResults = fbParser(facebook);
+        fbasynccallback();
+      } 
+    });
 
-    function twcallback(twitter) {
-      twitter = twParser(twitter);
-      res.render('main', {index:{test:twitter}});
+    // Push, pull TW post to async tasks
+    asyncTasks.push(function(twasynccallback) {
+      TWpullAllTweets(passport._strategies.twitter._oauth.accessToken, passport._strategies.twitter._oauth.tokenSecret, twcallback);
+
+      function twcallback(twitter) {
+        twitterResults = twParser(twitter);
+        twasynccallback();
+      }
+    });
+
+    // Excute all async tasks in the asyncTasks array
+    async.parallel(asyncTasks, function() {
+      // combine posts here!!!
+      var output = twitterResults.concat(facebookResults);
+      output.sort(function(a, b) { return b['updatedTimeValue'] - a['updatedTimeValue']});
+      res.render('main', {index:{test: output}});
+    });
+
+  } else {
+    if(passport._strategies.facebook._oauth2.hasOwnProperty('accessToken')) {
+      FBpullAllPosts(passport._strategies.facebook._oauth2.accessToken, passport._strategies.facebook._oauth2.profileID, fbcallback)
+       
+      function fbcallback(facebook){
+        facebook = fbParser(facebook);
+        res.render('main', {index:{test: facebook}});
+      } 
+    } 
+    else if (passport._strategies.twitter._oauth.hasOwnProperty('accessToken'))  {
+      TWpullAllTweets(passport._strategies.twitter._oauth.accessToken, passport._strategies.twitter._oauth.tokenSecret, twcallback);
+
+      function twcallback(twitter) {
+        twitter = twParser(twitter);
+        res.render('main', {index:{test:twitter}});
+      }
     }
   }
 });

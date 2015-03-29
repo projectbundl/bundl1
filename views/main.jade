@@ -1,5 +1,6 @@
 head
   title BUNDL Main
+  // link(rel='stylesheet', href='/css/main.css', type='text/css')
   body
     a(href='/') Logout!!
     |   
@@ -35,24 +36,23 @@ head
              br
              |  MESSAGE: #{index.test[i].message}
              br
-             |  TIME: #{index.test[i].time}
+             |  TIME: #{index.test[i].createdTimeString}
              br
              | COMMENT COUNT: #{index.test[i].commentCount}
-             - for (var j = 0; j < index.test[i].commentCount; j++)
-               div.comment
-                 p COMMENT ##{j+1}
-                 | ID: #{index.test[i].comments[j].postID}
-                 br
-                 | MESSAGE: #{index.test[i].comments[j].message} 
-                 br
-                 | AUTHOR: #{index.test[i].comments[j].author}
+           - for (var j = 0; j < index.test[i].commentCount; j++)
+             div.comment
+               p COMMENT ##{j+1}
+               | ID: #{index.test[i].comments[j].postID}
+               br
+               | MESSAGE: #{index.test[i].comments[j].message} 
+               br
+               | AUTHOR: #{index.test[i].comments[j].author}
+               br
+               | DATE: #{index.test[i].comments[j].timeString}
            div.messageBox
              form(method="post", action="/bin/processComment")
                input(type="text", value="#{index.test[i].postID}", name="id" hidden)
                textarea(name="commentMessage")
                div#submit
                  input(type="submit", value="Submit")
-    footer
-    |   
-    script(src='./js/mainPage.js')
 

@@ -10,7 +10,8 @@
     "fbgraph": "^0.3.0",
     "fs": "0.0.2",
     "sanitizer": "^0.1.2",
-    "https": "~1.0.0"
+    "https": "~1.0.0",
+    "moment": "~2.9.0"
   },
   "devDependencies": {},
   "scripts": {
