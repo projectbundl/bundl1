@@ -142,11 +142,11 @@ app.route('/post')
       // Ensure there is an access token for the SM that is having the social media post sent to
       var postMessage = req.body.postMessage;
       var selection = req.body.sel;
+      var asyncSubmitPosts = [];
 
-      if (selection.find('0')) {
+      if (selection.indexOf('0') > -1) {
         if (passport._strategies.facebook._oauth2.hasOwnProperty('accessToken') && passport._strategies.twitter._oauth.hasOwnProperty('accessToken')) {
           // Submit post
-          var asyncSubmitPosts = [];
           asyncSubmitPosts.push(function(fbAsyncCallback) {
             FBpostToFeedMessageAccessToken(postMessage, passport._strategies.facebook._oauth2.accessToken, fbcallback);
 
@@ -158,7 +158,7 @@ app.route('/post')
 
           asyncSubmitPosts.push(function(twAsyncCallback) {
             // Submit post to Twitter
-            TWtweet(comment, passport._strategies.twitter._oauth.accessToken, passport._strategies.twitter._oauth.tokenSecret, twcallback);
+            TWtweet(postMessage, passport._strategies.twitter._oauth.accessToken, passport._strategies.twitter._oauth.tokenSecret, twcallback);
 
             // Need to add if failure redirect
             function twcallback(response) {
@@ -166,39 +166,48 @@ app.route('/post')
             }
           });
 
-          async.parallel(asyncSubmitPosts, function() {
-            // Check if there were errors
-            res.redirect('main');
-          });
         } else {
+          res.redirect('error');
           // unauthorized
         }
-      } else if (selection.find('1')) {
-        if (passport._strategies.facebook._oauth2.hasOwnProperty('accessToken')) {
-          // Submit post to FB
-          FBpostToFeedMessageAccessToken(postMessage, passport._strategies.facebook._oauth2.accessToken, fbcallback);
+      } else {
+        if (selection.indexOf('1') > -1) {
+           if (passport._strategies.facebook._oauth2.hasOwnProperty('accessToken')) {
+            // Submit post to FB
+            asyncSubmitPosts.push(function(fbAsyncSingleCallback) {
+              FBpostToFeedMessageAccessToken(postMessage, passport._strategies.facebook._oauth2.accessToken, fbcallback);
 
-          // Need to add if failure redirect
-          function fbcallback(facebook){
-            res.redirect('main');
+              // Need to add if failure redirect
+              function fbcallback(facebook){
+                fbAsyncSingleCallback();
+              } 
+            });
+          } else {
+            // unauthorized
+            res.redirect('error');
           }
-        } else {
-          // unauthorized
-        }
-      } else if (selection.find('2')) {
-        if (passport._strategies.twitter._oauth.hasOwnProperty('accessToken')) {
-          // Submit post to Twitter
-          TWtweet(comment, passport._strategies.twitter._oauth.accessToken, passport._strategies.twitter._oauth.tokenSecret, twcallback);
+        } if (selection.indexOf('2') > -1) {
+            if (passport._strategies.twitter._oauth.hasOwnProperty('accessToken')) {
+              // Submit post to Twitter
+              asyncSubmitPosts.push(function(twAsyncSingleCallback) {
+                TWtweet(postMessage, passport._strategies.twitter._oauth.accessToken, passport._strategies.twitter._oauth.tokenSecret, twcallback);
 
-          // Need to add if failure redirect
-          function twcallback(response) {
-            res.redirect('main');
+                // Need to add if failure redirect
+                function twcallback(response) {
+                  twAsyncSingleCallback();
+                }
+              });
+            } else {
+            // unauthorzied
+              res.redirect('error');
           }
-        } else {
-          // unauthorzied
         }
       }
-    res.redirect('post');
+      async.parallel(asyncSubmitPosts, function() {
+        // Check if there were errors
+        res.redirect('main');
+      });
+    //res.redirect('post');
     }
   });
 
@@ -376,7 +385,7 @@ var TWpullAllTweets = function(accessKey, accessSecret, callback) {
     access_token_secret: accessSecret
   });
 
-  client.get('statuses/user_timeline.json', {screen_name:'bundl_man', count:2}, function(error, tweets, res) {
+  client.get('statuses/user_timeline.json', {screen_name:'bundl_man'}, function(error, tweets, res) {
   //client.get('statuses/home_timeline', {count:1}, function(error, tweets, res) {
     if (error) throw error;
 

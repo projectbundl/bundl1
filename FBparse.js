@@ -5,7 +5,10 @@ module.exports = function (input){
   var aryMess = input.data;
 
   for (var i in aryMess) {
+    aryMess[i].socialMedia = 1;
     messageArray.push(new Post(aryMess[i]));
   }
   return messageArray;
 };
+
+

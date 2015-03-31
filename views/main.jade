@@ -39,6 +39,8 @@ head
              |  TIME: #{index.test[i].createdTimeString}
              br
              | COMMENT COUNT: #{index.test[i].commentCount}
+             br
+             | Social Media: #{index.test[i].socialMedia}
            - for (var j = 0; j < index.test[i].commentCount; j++)
              div.comment
                p COMMENT ##{j+1}
@@ -49,6 +51,8 @@ head
                | AUTHOR: #{index.test[i].comments[j].author}
                br
                | DATE: #{index.test[i].comments[j].timeString}
+               br
+               | Social Media: #{index.test[i].comments[j].socialMedia}
            div.messageBox
              form(method="post", action="/bin/processComment")
                input(type="text", value="#{index.test[i].postID}", name="id" hidden)
