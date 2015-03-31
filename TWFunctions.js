@@ -1,3 +1,6 @@
+var Twitter = require('twitter');
+
+
 exports.TWpullAllTweets = function(accessKey, accessSecret, callback) {
   var client = new Twitter({
     consumer_key: TWITTER_CONSUMER_KEY,

@@ -2,8 +2,7 @@
 var express = require('express')
   , async = require('async')
   , https = require('https')
-  , path = require('path')
-  , graph = require('fbgraph')
+  , path = require('path'))
   , creds = require("./creds")
   , engine = require('consolidate')
   , passport = require('passport')
@@ -16,9 +15,9 @@ var express = require('express')
   , bodyParser = require("body-parser")
   , cookieParser = require("cookie-parser")
   , fbParser = require('./FBparse.js')
-  , Twitter = require('twitter')
   , twParser = require('./TWparse.js')
-  , twFuncitons = require('./TWFunctions.js')
+  , fbFunctions = require('./FBFunctions.js'
+  , twFunctions = require('./TWFunctions.js')
   , methodOverride = require('method-override');
 
 var FACEBOOK_APP_ID = creds.fb.id;
@@ -125,7 +124,7 @@ app.post('/bin/processComment', function(req, res) {
   // Ensure there is an access token for the SM that is having the social media post sent to
   if (req.body.commentMessage) {
     if (passport._strategies.facebook._oauth2.hasOwnProperty('accessToken')) {
-      FBcommentToPost(req.body.commentMessage, req.body.id, passport._strategies.facebook._oauth2.accessToken, fbCommentCallback);
+      fbFunctions.FBcommentToPost(req.body.commentMessage, req.body.id, passport._strategies.facebook._oauth2.accessToken, fbCommentCallback);
 
       function fbCommentCallback(response) {
         res.redirect('../main');
@@ -149,7 +148,7 @@ app.route('/post')
         if (passport._strategies.facebook._oauth2.hasOwnProperty('accessToken') && passport._strategies.twitter._oauth.hasOwnProperty('accessToken')) {
           // Submit post
           asyncSubmitPosts.push(function(fbAsyncCallback) {
-            FBpostToFeedMessageAccessToken(postMessage, passport._strategies.facebook._oauth2.accessToken, fbcallback);
+            fbFunctions.FBpostToFeedMessageAccessToken(postMessage, passport._strategies.facebook._oauth2.accessToken, fbcallback);
 
             // Need to add if failure redirect
             function fbcallback(facebook){
@@ -176,7 +175,7 @@ app.route('/post')
            if (passport._strategies.facebook._oauth2.hasOwnProperty('accessToken')) {
             // Submit post to FB
             asyncSubmitPosts.push(function(fbAsyncSingleCallback) {
-              FBpostToFeedMessageAccessToken(postMessage, passport._strategies.facebook._oauth2.accessToken, fbcallback);
+              fbFunctions.FBpostToFeedMessageAccessToken(postMessage, passport._strategies.facebook._oauth2.accessToken, fbcallback);
 
               // Need to add if failure redirect
               function fbcallback(facebook){
@@ -226,7 +225,7 @@ app.use('/main', function(req, res){
     
     // Push, pull FB post to async tasks
     asyncTasks.push(function(fbasynccallback) {
-      FBpullAllPosts(passport._strategies.facebook._oauth2.accessToken, passport._strategies.facebook._oauth2.profileID, fbcallback)
+      fbFunctions.FBpullAllPosts(passport._strategies.facebook._oauth2.accessToken, passport._strategies.facebook._oauth2.profileID, fbcallback)
        
       function fbcallback(facebook){
         facebookResults = fbParser(facebook);
@@ -254,7 +253,7 @@ app.use('/main', function(req, res){
 
   } else {
     if(passport._strategies.facebook._oauth2.hasOwnProperty('accessToken')) {
-      FBpullAllPosts(passport._strategies.facebook._oauth2.accessToken, passport._strategies.facebook._oauth2.profileID, fbcallback)
+      fbFunctions.FBpullAllPosts(passport._strategies.facebook._oauth2.accessToken, passport._strategies.facebook._oauth2.profileID, fbcallback)
        
       function fbcallback(facebook){
         facebook = fbParser(facebook);
@@ -334,36 +333,3 @@ function ensureAuthenticated(req, res, next) {
   if (req.isAuthenticated()) { return next(); }
   res.redirect('index')
 }
-
-var FBpostToFeedMessageAccessToken = function (mess, accessToken, callback) {
-  graph.setAccessToken(accessToken);
-  var temp = {'message':mess};
-  graph.post("/feed", temp , function(err, res) {
-    if (res) {
-      callback(res);
-    } else {
-      console.log('2',err);
-    }
-  });
-};
-
-
-var FBpullAllPosts = function(accessToken, userID, callback) {
-  graph.setAccessToken(accessToken);
-  var post = "/" + userID + "/posts";
-  graph.get(post, function(err, res) {
-    callback(res);
-  });
-};
-
-
-var FBcommentToPost = function (message, postID, token, callback) {
-  graph.setAccessToken(token);
-  graph.post("/" + postID + "/comments", {'message':message}, function(err, res) {
-    callback(res);
-  });
-};
-
-
-
-
