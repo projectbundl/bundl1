@@ -1,4 +1,9 @@
 var Twitter = require('twitter');
+var fs = require('fs');
+var creds = require('./creds');
+
+var TWITTER_CONSUMER_KEY = creds.tw.id;
+var TWITTER_CONSUMER_SECRET = creds.tw.secret;
 
 
 exports.TWpullAllTweets = function(accessKey, accessSecret, callback) {
@@ -13,7 +18,7 @@ exports.TWpullAllTweets = function(accessKey, accessSecret, callback) {
   //client.get('statuses/home_timeline', {count:1}, function(error, tweets, res) {
     if (error) throw error;
 
-    callback(JSON.parse(res.body));
+    callback(error, JSON.parse(res.body));
   });
 };
 
@@ -26,7 +31,7 @@ exports.TWtweet = function (message, accessKey, accessSecret, callback) {
   });
 
   client.post('statuses/update.json', {'status':message}, function(error, res) {
-    callback(res);
+    callback(error, res);
   });
 
 };

@@ -1,6 +1,7 @@
 // set variables for environment
 var express = require('express')
   , async = require('async')
+  , fs = require('fs')
   , https = require('https')
   , creds = require("./creds")
   , passport = require('passport')
@@ -11,7 +12,7 @@ var express = require('express')
   , cookieParser = require("cookie-parser")
   , fbParser = require('./FBparse.js')
   , twParser = require('./TWparse.js')
-  , fbFunctions = require('./FBFunctions.js'
+  , fbFunctions = require('./FBFunctions.js')
   , twFunctions = require('./TWFunctions.js');
 
 var FACEBOOK_APP_ID = creds.fb.id;
@@ -113,7 +114,7 @@ passport.use('facebook', new FacebookStrategy({
     });
   }
 ));
-   
+
 app.post('/bin/processComment', function(req, res) {
   // Ensure there is an access token for the SM that is having the social media post sent to
   if (req.body.commentMessage) {
@@ -137,31 +138,40 @@ app.route('/post')
       var postMessage = req.body.postMessage;
       var selection = req.body.sel;
       var asyncSubmitPosts = [];
+      var errorMessage = '';
 
       if (selection.indexOf('0') > -1) {
-        if (passport._strategies.facebook._oauth2.hasOwnProperty('accessToken') && passport._strategies.twitter._oauth.hasOwnProperty('accessToken')) {
+        if (passport._strategies.facebook._oauth2.hasOwnProperty('accessToken')) {
           // Submit post
           asyncSubmitPosts.push(function(fbAsyncCallback) {
             fbFunctions.FBpostToFeedMessageAccessToken(postMessage, passport._strategies.facebook._oauth2.accessToken, fbcallback);
 
             // Need to add if failure redirect
-            function fbcallback(facebook){
+            function fbcallback(err, facebook){
+              if (err) errorMessage += "Yo there was an error submitting your Facebook Post\n";
               fbAsyncCallback();
             }
           });
+        } else {
+          errorMessage += "Yo you do not have access to post to Facebook!\n";
+          // unauthorized
+        }
+
+        if (passport._strategies.twitter._oauth.hasOwnProperty('accessToken')) {
+
 
           asyncSubmitPosts.push(function(twAsyncCallback) {
             // Submit post to Twitter
             twFunctions.TWtweet(postMessage, passport._strategies.twitter._oauth.accessToken, passport._strategies.twitter._oauth.tokenSecret, twcallback);
 
             // Need to add if failure redirect
-            function twcallback(response) {
+            function twcallback(err, response) {
+              if (err) errorMessage += "Yo there was an error submitting your Twitter Post\n";
               twAsyncCallback();
             }
           });
-
         } else {
-          res.redirect('error');
+          errorMessage += "Yo you do not have access to post to Twitter!\n";
           // unauthorized
         }
       } else {
@@ -172,13 +182,14 @@ app.route('/post')
               fbFunctions.FBpostToFeedMessageAccessToken(postMessage, passport._strategies.facebook._oauth2.accessToken, fbcallback);
 
               // Need to add if failure redirect
-              function fbcallback(facebook){
+              function fbcallback(err, facebook){
+                if (err) errorMessage += "Yo there was an error submitting your Facebook Post\n";
                 fbAsyncSingleCallback();
               } 
             });
           } else {
+            errorMessage += "Yo you do not have access to post to Facebook\n";
             // unauthorized
-            res.redirect('error');
           }
         } if (selection.indexOf('2') > -1) {
             if (passport._strategies.twitter._oauth.hasOwnProperty('accessToken')) {
@@ -187,19 +198,24 @@ app.route('/post')
                 twFunctions.TWtweet(postMessage, passport._strategies.twitter._oauth.accessToken, passport._strategies.twitter._oauth.tokenSecret, twcallback);
 
                 // Need to add if failure redirect
-                function twcallback(response) {
+                function twcallback(err, response) {
+                  if (err) errorMessage += "Yo there was an error submitting your Twitter Post\n";
                   twAsyncSingleCallback();
                 }
               });
             } else {
+              errorMessage += "Yo you do not have access to post to Twitter!\n";
             // unauthorzied
-              res.redirect('error');
             }
         }
       }
       async.parallel(asyncSubmitPosts, function() {
         // Check if there were errors
+        if (errorMessage == '')
         res.redirect('main');
+      else
+        res.redirect('main?error='+errorMessage);
+        //res.redirect('main');
       });
     //res.redirect('post');
     }
@@ -221,7 +237,7 @@ app.use('/main', function(req, res) {
     asyncTasks.push(function(fbasynccallback) {
       fbFunctions.FBpullAllPosts(passport._strategies.facebook._oauth2.accessToken, passport._strategies.facebook._oauth2.profileID, fbcallback)
        
-      function fbcallback(facebook){
+      function fbcallback(err, facebook){
         facebookResults = fbParser(facebook);
         fbasynccallback();
       } 
@@ -231,7 +247,7 @@ app.use('/main', function(req, res) {
     asyncTasks.push(function(twasynccallback) {
       twFunctions.TWpullAllTweets(passport._strategies.twitter._oauth.accessToken, passport._strategies.twitter._oauth.tokenSecret, twcallback);
 
-      function twcallback(twitter) {
+      function twcallback(err, twitter) {
        twitterResults = twParser(twitter);
         twasynccallback();
       }
@@ -241,25 +257,37 @@ app.use('/main', function(req, res) {
     async.parallel(asyncTasks, function() {
       // combine posts here!!!
       var output = twitterResults.concat(facebookResults);
-      output.sort(function(a, b) { return b['updatedTimeValue'] - a['updatedTimeValue']});
-      res.render('main', {index:{test: output}});
+      //output.sort(function(a, b) { return b['updatedTimeValue'] - a['updatedTimeValue']});
+      if (req.query['error'] !== 'undefined') {
+        res.render('main', {'errorMessage':req.query['error'], index:{test: output}});
+        } else {
+      res.render('main', {'errorMessage':'', index:{test: output}});
+        }
     });
 
   } else {
     if (passport._strategies.facebook._oauth2.hasOwnProperty('accessToken')) {
       fbFunctions.FBpullAllPosts(passport._strategies.facebook._oauth2.accessToken, passport._strategies.facebook._oauth2.profileID, fbcallback)
        
-      function fbcallback(facebook) {
+      function fbcallback(err, facebook) {
         facebook = fbParser(facebook);
-         res.render('main', {index:{test: facebook}});
+        if (req.query['error'] !== 'undefined') {
+          res.render('main', {'errorMessage':req.query['error'], index:{test: facebook}});
+        } else {
+         res.render('main', {'errorMessage':'', index:{test: facebook}});
+        }
        } 
     } 
     else if (passport._strategies.twitter._oauth.hasOwnProperty('accessToken'))  {
       twFunctions.TWpullAllTweets(passport._strategies.twitter._oauth.accessToken, passport._strategies.twitter._oauth.tokenSecret, twcallback);
 
-       function twcallback(twitter) {
+       function twcallback(err, twitter) {
         twitter = twParser(twitter);
-         res.render('main', {index:{test:twitter}});
+        if (req.query['error'] !== 'undefined') {
+          res.render('main', {'errorMessage':req.query['error'], index:{test: twitter}});
+        } else {
+         res.render('main', {'errorMessage':'', index:{test:twitter}});
+       }
        }
     }
   }
