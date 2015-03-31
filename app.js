@@ -18,6 +18,7 @@ var express = require('express')
   , fbParser = require('./FBparse.js')
   , Twitter = require('twitter')
   , twParser = require('./TWparse.js')
+  , twFuncitons = require('./TWFunctions.js')
   , methodOverride = require('method-override');
 
 var FACEBOOK_APP_ID = creds.fb.id;
@@ -158,7 +159,7 @@ app.route('/post')
 
           asyncSubmitPosts.push(function(twAsyncCallback) {
             // Submit post to Twitter
-            TWtweet(postMessage, passport._strategies.twitter._oauth.accessToken, passport._strategies.twitter._oauth.tokenSecret, twcallback);
+            twFunctions.TWtweet(postMessage, passport._strategies.twitter._oauth.accessToken, passport._strategies.twitter._oauth.tokenSecret, twcallback);
 
             // Need to add if failure redirect
             function twcallback(response) {
@@ -190,7 +191,7 @@ app.route('/post')
             if (passport._strategies.twitter._oauth.hasOwnProperty('accessToken')) {
               // Submit post to Twitter
               asyncSubmitPosts.push(function(twAsyncSingleCallback) {
-                TWtweet(postMessage, passport._strategies.twitter._oauth.accessToken, passport._strategies.twitter._oauth.tokenSecret, twcallback);
+                twFunctions.TWtweet(postMessage, passport._strategies.twitter._oauth.accessToken, passport._strategies.twitter._oauth.tokenSecret, twcallback);
 
                 // Need to add if failure redirect
                 function twcallback(response) {
@@ -200,7 +201,7 @@ app.route('/post')
             } else {
             // unauthorzied
               res.redirect('error');
-          }
+            }
         }
       }
       async.parallel(asyncSubmitPosts, function() {
@@ -235,7 +236,7 @@ app.use('/main', function(req, res){
 
     // Push, pull TW post to async tasks
     asyncTasks.push(function(twasynccallback) {
-      TWpullAllTweets(passport._strategies.twitter._oauth.accessToken, passport._strategies.twitter._oauth.tokenSecret, twcallback);
+      twFunctions.TWpullAllTweets(passport._strategies.twitter._oauth.accessToken, passport._strategies.twitter._oauth.tokenSecret, twcallback);
 
       function twcallback(twitter) {
         twitterResults = twParser(twitter);
@@ -261,7 +262,7 @@ app.use('/main', function(req, res){
       } 
     } 
     else if (passport._strategies.twitter._oauth.hasOwnProperty('accessToken'))  {
-      TWpullAllTweets(passport._strategies.twitter._oauth.accessToken, passport._strategies.twitter._oauth.tokenSecret, twcallback);
+      twFunctions.TWpullAllTweets(passport._strategies.twitter._oauth.accessToken, passport._strategies.twitter._oauth.tokenSecret, twcallback);
 
       function twcallback(twitter) {
         twitter = twParser(twitter);
@@ -363,32 +364,6 @@ var FBcommentToPost = function (message, postID, token, callback) {
   });
 };
 
-var TWtweet = function (message, accessKey, accessSecret, callback) {
-  var client = new Twitter({
-    consumer_key: TWITTER_CONSUMER_KEY,
-    consumer_secret: TWITTER_CONSUMER_SECRET,
-    access_token_key: accessKey,
-    access_token_secret: accessSecret
-  });
 
-  client.post('statuses/update.json', {'status':message}, function(error, res) {
-    callback(res);
-  });
 
-};
 
-var TWpullAllTweets = function(accessKey, accessSecret, callback) {
-  var client = new Twitter({
-    consumer_key: TWITTER_CONSUMER_KEY,
-    consumer_secret: TWITTER_CONSUMER_SECRET,
-    access_token_key: accessKey,
-    access_token_secret: accessSecret
-  });
-
-  client.get('statuses/user_timeline.json', {screen_name:'bundl_man'}, function(error, tweets, res) {
-  //client.get('statuses/home_timeline', {count:1}, function(error, tweets, res) {
-    if (error) throw error;
-
-    callback(JSON.parse(res.body));
-  });
-};
