@@ -2,23 +2,17 @@
 var express = require('express')
   , async = require('async')
   , https = require('https')
-  , path = require('path'))
   , creds = require("./creds")
-  , engine = require('consolidate')
   , passport = require('passport')
-  , util = require('util')
-  , fs = require('fs')
   , FacebookStrategy = require('passport-facebook').Strategy
   , TwitterStrategy = require('passport-twitter').Strategy
-  , logger = require('morgan')
   , session = require('express-session')
   , bodyParser = require("body-parser")
   , cookieParser = require("cookie-parser")
   , fbParser = require('./FBparse.js')
   , twParser = require('./TWparse.js')
   , fbFunctions = require('./FBFunctions.js'
-  , twFunctions = require('./TWFunctions.js')
-  , methodOverride = require('method-override');
+  , twFunctions = require('./TWFunctions.js');
 
 var FACEBOOK_APP_ID = creds.fb.id;
 var FACEBOOK_APP_SECRET = creds.fb.secret;
@@ -215,7 +209,7 @@ app.use('/error', function(req, res) {
   res.render('error');
 });
 
-app.use('/main', function(req, res){
+app.use('/main', function(req, res) {
   // Have both tokens combine post data
   if (passport._strategies.facebook._oauth2.hasOwnProperty('accessToken') && passport._strategies.twitter._oauth.hasOwnProperty('accessToken')) {
     var facebookResults;
@@ -233,12 +227,12 @@ app.use('/main', function(req, res){
       } 
     });
 
-    // Push, pull TW post to async tasks
+     // Push, pull TW post to async tasks
     asyncTasks.push(function(twasynccallback) {
       twFunctions.TWpullAllTweets(passport._strategies.twitter._oauth.accessToken, passport._strategies.twitter._oauth.tokenSecret, twcallback);
 
       function twcallback(twitter) {
-        twitterResults = twParser(twitter);
+       twitterResults = twParser(twitter);
         twasynccallback();
       }
     });
@@ -252,21 +246,21 @@ app.use('/main', function(req, res){
     });
 
   } else {
-    if(passport._strategies.facebook._oauth2.hasOwnProperty('accessToken')) {
+    if (passport._strategies.facebook._oauth2.hasOwnProperty('accessToken')) {
       fbFunctions.FBpullAllPosts(passport._strategies.facebook._oauth2.accessToken, passport._strategies.facebook._oauth2.profileID, fbcallback)
        
-      function fbcallback(facebook){
+      function fbcallback(facebook) {
         facebook = fbParser(facebook);
-        res.render('main', {index:{test: facebook}});
-      } 
+         res.render('main', {index:{test: facebook}});
+       } 
     } 
     else if (passport._strategies.twitter._oauth.hasOwnProperty('accessToken'))  {
       twFunctions.TWpullAllTweets(passport._strategies.twitter._oauth.accessToken, passport._strategies.twitter._oauth.tokenSecret, twcallback);
 
-      function twcallback(twitter) {
+       function twcallback(twitter) {
         twitter = twParser(twitter);
-        res.render('main', {index:{test:twitter}});
-      }
+         res.render('main', {index:{test:twitter}});
+       }
     }
   }
 });
@@ -296,7 +290,7 @@ app.get('/auth/twitter' , passport.authenticate('twitter'), function(req, res) {
 //   login page.  Otherwise, the primary route function function will be called,
 //   which, in this example, will redirect the user to the home page.
 app.get('/auth/facebook/callback', 
-   passport.authenticate('facebook', { failureRedirect: '/index', successRedirect:'/main'}));
+  passport.authenticate('facebook', { failureRedirect: '/index', successRedirect:'/main'}));
 
 app.get('/auth/twitter/callback', 
   passport.authenticate('twitter', { successRedirect: '/main', failureRedirect: '/index' }));
