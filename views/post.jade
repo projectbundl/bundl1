@@ -1,49 +1,59 @@
-doctype html
-head
-  title BUNDL Post
-  body
-    center
-      img(src='./images/bundlLogo6.png', alt='BUNDL Logo')
-    |   
-    aside.links
-      a(href='./main')
-        img(src='./images/feedButton.png', alt='Navigate to Feed')
-      |     
-      a(href='http://www.plus.google.com')
-        img(src='./images/googleButton.png', alt='Navigate to Google+')
-      |     
-      a(href='http://www.facebook.com')
-        img(src='./images/facebookButton.png', alt='Navigate to Facebook')
-      |     
-      a(href='http://www.twitter.com')
-        img(src='./images/twitterButton.png', alt='Navigate to Twitter')
-      |     
-      a(href='http://www.linkedin.com')
-        img(src='./images/linkedInButton.png', alt='Navigate to LinkedIn')
-    |   
-    section
-      center        
-        div.messageBox
-          form(method="post", action="/post") 
-            input(type='checkbox', name='sel', value='0')
-            | Select All
-            |       
-            input(type='checkbox', name='sel', value='1')
-            | Facebook
-            |       
-            input(type='checkbox', name='sel', value='google')
-            | Google+
-            |       
-            input(type='checkbox', name='sel', value='linkedin')
-            | LinkedIn
-            |       
-            input(type='checkbox', name='sel', value='2')
-            | Twitter
-            br
-            br
-            textarea(name="postMessage", rows="10", cols="75")         
-            br
-            br
-            br
-            div#submit
-              input(type="submit", value="Submit!")  
+<!DOCTYPE html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<title>BUNDL</title>
+<link href="css/bundl_style.css" rel="stylesheet" type="text/css" />
+
+     
+</head>
+<body id="home">
+<div id="bundl_wrapper">
+    <div id="bundl_header">
+        <div id="bundl_menu">
+            <ul>
+                <li><a href="index.jade"><span></span>Home</a></li>
+                <li><a href="features.jade"><span></span>Features</a></li>
+                <li><a href="support.jade"><span></span>Support</a></li>
+                <li><a href="about.jade"><span></span>About</a></li>
+            </ul>    	
+        </div> 
+        
+        <div id="bundl_title">
+       	  <div class="title_dotted">
+            <h1>WELCOME TO BUNDL</h1>
+	</div>
+    </div> <!-- end of header -->
+    
+
+
+<div id="bundl_main">
+    	
+   
+ <form>
+      <input type="checkbox" name="sel" value="all">Select All&nbsp
+      <input type="checkbox" name="sel" value="facebook">Facebook&nbsp
+      <input type="checkbox" name="sel" value="google">Google+&nbsp
+      <input type="checkbox" name="sel" value="linkedin">LinkedIn&nbsp
+      <input type="checkbox" name="sel" value="twitter">Twitter<br>
+      <img src="./images/post.png" alt="Post">
+    <form> 
+    
+			</div>
+           
+        </div> <!-- end of content -->
+    </div> <!-- end of main -->
+    
+</div> <!-- end of wrapper -->
+<div id="bundl_footer_wrapper">
+    <div id="bundl_footer">
+        Copyright © 2015 <a href="#">BUNDL</a>
+    	 
+    </div>
+</div>    
+
+
+  <script src="./js/mainPage.js"></script>
+		
+</body>
+</html>
+

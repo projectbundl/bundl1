@@ -6,9 +6,12 @@ module.exports = function (input){
 
   for (var i in aryMess) {
     aryMess[i].socialMedia = 1;
-    messageArray.push(new Post(aryMess[i]));
+    if (aryMess[i].hasOwnProperty('likes')) {
+      aryMess[i].like_count = aryMess[i].likes.data.length; 
+    } else {
+      aryMess[i].like_count = 0;
+    }
+    messageArray.push(new Post(aryMess[i])); 
   }
   return messageArray;
 };
-
-

@@ -1,61 +1,45 @@
+doctype html
 head
-  title BUNDL Feed
-  body
-    center
-      img(src='./images/bundlLogo7.png', alt='BUNDL Logo')
-    |   
-    aside.links
-      a(href='./main')
-        img(src='./images/feedButton.png', alt='Navigate to post')
-      |     
-      a(href='http://www.plus.google.com')
-        img(src='./images/googleButton.png', alt='Navigate to Google+')
-      |     
-      a(href='http://www.facebook.com')
-        img(src='./images/facebookButton.png', alt='Navigate to Facebook')
-      |     
-      a(href='http://www.twitter.com')
-        img(src='./images/twitterButton.png', alt='Navigate to Twitter')
-      |     
-      a(href='http://www.linkedin.com')
-        img(src='./images/linkedInButton.png', alt='Navigate to LinkedIn')
-    |   
-    section
-      center
-        br
-        |     
-        img(src='./images/post2rep.png', alt='post2')
-        br
+  meta(http-equiv='Content-Type', content='text/html; charset=utf-8')
+    title BUNDL
+    link(href='css/bundl_style.css', rel='stylesheet', type='text/css')
+  body#home
+    #bundl_wrapper
+      #bundl_header
+        #bundl_menu
+          ul
+            li
+              a(href='index.jade')
+                span
+                | Home
+            |                 
+            li
+              a(href='features.jade')
+                span
+                | Features
+            |                 
+            li
+              a(href='support.jade')
+                span
+                | Support
+            |                 
+            li
+              a(href='about.jade')
+                span
+                | About
         |  
-        a(href='./reply')
-          img(src='./images/reply.png', alt='reply')
-        br
-        |  
-        a(href='./reply')
-          img(src='./images/reply2.png', alt='reply')
-        br
-        |     
-        img(src='./images/post2.png', alt='post2')
-        br
-        |     
-        img(src='./images/post2.png', alt='post2')
-        br
-        |     
-        img(src='./images/post2.png', alt='post2')
-        br
-        |     
-        img(src='./images/post2.png', alt='post2')
-        br
-        |     
-        img(src='./images/post2.png', alt='post2')
-        br
-        |     
-        img(src='./images/post2.png', alt='post2')
-        br
-        |     
-        img(src='./images/post2.png', alt='post2')
-        br
-        |     
-        img(src='./images/post2.png', alt='post2')
-        br
-    footer
+        |         
+        |         
+        #bundl_title
+          .title_dotted
+            h1  BUNDL
+        // end of header
+        #bundl_main
+          a(href='http://www.plus.google.com')  google 
+      // end of content
+    // end of main
+    // end of wrapper
+    #bundl_footer_wrapper
+      #bundl_footer
+        | Copyright &copy; 2015 
+        a(href='#') BUNDL

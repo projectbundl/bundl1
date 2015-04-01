@@ -1,0 +1,49 @@
+doctype html
+head
+  title BUNDL Post
+  body
+    center
+      img(src='./images/bundlLogo6.png', alt='BUNDL Logo')
+    |   
+    aside.links
+      a(href='./main')
+        img(src='./images/feedButton.png', alt='Navigate to Feed')
+      |     
+      a(href='http://www.plus.google.com')
+        img(src='./images/googleButton.png', alt='Navigate to Google+')
+      |     
+      a(href='http://www.facebook.com')
+        img(src='./images/facebookButton.png', alt='Navigate to Facebook')
+      |     
+      a(href='http://www.twitter.com')
+        img(src='./images/twitterButton.png', alt='Navigate to Twitter')
+      |     
+      a(href='http://www.linkedin.com')
+        img(src='./images/linkedInButton.png', alt='Navigate to LinkedIn')
+    |   
+    section
+      center        
+        div.messageBox
+          form(method="post", action="/post") 
+            input(type='checkbox', name='sel', value='0')
+            | Select All
+            |       
+            input(type='checkbox', name='sel', value='1')
+            | Facebook
+            |       
+            input(type='checkbox', name='sel', value='google')
+            | Google+
+            |       
+            input(type='checkbox', name='sel', value='linkedin')
+            | LinkedIn
+            |       
+            input(type='checkbox', name='sel', value='2')
+            | Twitter
+            br
+            br
+            textarea(name="postMessage", rows="10", cols="75")         
+            br
+            br
+            br
+            div#submit
+              input(type="submit", value="Submit!")  

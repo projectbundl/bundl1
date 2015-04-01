@@ -11,6 +11,7 @@ function Post(obj) {
   this.updatedTimeValue = Date.parse(obj.updated_time);
   this.socialMedia = obj.socialMedia;
   this.comments = createCommentList(obj, obj.socialMedia);
+  this.like_count=obj.like_count;
 }
 
 function commentCount(list) {

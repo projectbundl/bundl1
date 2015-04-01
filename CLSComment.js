@@ -7,6 +7,7 @@ function Comment(obj) {
   this.timeString = obj.created_time;
   this.timeValue = Date.parse(obj.created_time);
   this.socialMedia = obj.socialMedia;
+  this.like_count = obj.like_count;
 
 }
 
