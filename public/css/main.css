@@ -1,11 +1,22 @@
-aside {
-  width: 15%;
-  overflow: hidden;
+body {
+  margin: 0;
+  padding: 0;
+  color: #333;
+  font-family: Tahoma, Geneva, sans-serif;
+  font-size: 13px;
+  background-color: #ececec;
+  background-repeat: repeat-x;
+  background-position: top;
+
 }
 
-section {
-  display: 50%;
-  float: right;
-  overflow: hidden;
+
+.content {
+  float:right;
+  width:70%;
+  text-align:center;
 }
 
+#bundl_sidebar {
+  position: fixed;
+}

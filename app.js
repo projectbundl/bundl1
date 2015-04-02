@@ -25,7 +25,7 @@ var app = express();
 app.use(bodyParser.urlencoded({extended:true}));
 app.use(bodyParser.json());
 app.use(express.static(__dirname + '/public'));
-app.use(express.static(__dirname + '/views'));
+app.use(express.static(__dirname + '/viewws'));
 app.set('view engine', 'jade');
 app.use(cookieParser());
 
@@ -84,6 +84,7 @@ passport.use('twitter', new TwitterStrategy({
       //if (err) { return done(err); }
       
       // lookup user in DB
+      passport._strategies.twitter._oauth.name = profile.displayName;
       passport._strategies.twitter._oauth.accessToken = accessToken;
       passport._strategies.twitter._oauth.tokenSecret = tokenSecret;
       return done(null, profile);
@@ -108,6 +109,7 @@ passport.use('facebook', new FacebookStrategy({
       
     // Can create our own cookie after user validation/ combine social media info from db
     // http://zipplease.tumblr.com/post/34169331215/node-js-session-management-with-express
+    passport._strategies.facebook._oauth2.name = profile.displayName;
     passport._strategies.facebook._oauth2.accessToken = accessToken;
     passport._strategies.facebook._oauth2.profileID = profile.id;
     return done(null, profile);
@@ -118,12 +120,20 @@ passport.use('facebook', new FacebookStrategy({
 app.post('/bin/processComment', function(req, res) {
   // Ensure there is an access token for the SM that is having the social media post sent to
   if (req.body.commentMessage) {
-    if (passport._strategies.facebook._oauth2.hasOwnProperty('accessToken')) {
+    if (req.body.smID == '1') {
       fbFunctions.FBcommentToPost(req.body.commentMessage, req.body.id, passport._strategies.facebook._oauth2.accessToken, fbCommentCallback);
 
       function fbCommentCallback(response) {
         res.redirect('../main');
       }
+    } else if (req.body.smID == '2') {
+      twFunctions.TWcomment(req.body.commentMessage, req.body.id, passport._strategies.twitter._oauth.accessToken, passport._strategies.twitter._oauth.tokenSecret, twCommentCallback);
+
+      function twCommentCallback(response) {
+        res.redirect('../main');
+      }
+    } else {
+      res.redirect('../main');
     }
   }
 });
@@ -139,6 +149,7 @@ app.route('/post')
       var selection = req.body.sel;
       var asyncSubmitPosts = [];
       var errorMessage = '';
+
 
       if (selection.indexOf('0') > -1 || selection.indexOf('1') > -1) {
         if (passport._strategies.facebook._oauth2.hasOwnProperty('accessToken')) {
@@ -191,6 +202,7 @@ app.use('/error', function(req, res) {
 app.use('/main', function(req, res) {
   var facebookResults;
   var twitterResults;
+  var userName;
   var asyncTasks = [];
 
   if (passport._strategies.facebook._oauth2.hasOwnProperty('accessToken')) {
@@ -200,6 +212,7 @@ app.use('/main', function(req, res) {
        
       function fbcallback(err, facebook){
         facebookResults = fbParser(facebook);
+        userName = passport._strategies.facebook._oauth2.name;
         fbasynccallback();
       } 
     });
@@ -211,7 +224,8 @@ app.use('/main', function(req, res) {
       twFunctions.TWpullAllTweets(passport._strategies.twitter._oauth.accessToken, passport._strategies.twitter._oauth.tokenSecret, twcallback);
 
       function twcallback(err, twitter) {
-       twitterResults = twParser(twitter);
+        twitterResults = twParser(twitter);
+        userName = passport._strategies.twitter._oauth.name;
         twasynccallback();
       }
     });
@@ -229,9 +243,9 @@ app.use('/main', function(req, res) {
     }
     //output.sort(function(a, b) { return b['updatedTimeValue'] - a['updatedTimeValue']});
     if (req.query['error'] !== 'undefined') {
-      res.render('main', {'errorMessage':req.query['error'], index:{test: output}});
+      res.render('main', {'errorMessage':req.query['error'], index:{test: output}, 'name':userName});
     } else {
-      res.render('main', {'errorMessage':'', index:{test: output}});
+      res.render('main', {'errorMessage':'', index:{test: output}, 'name':userName});
     }
   });
 
@@ -245,6 +259,18 @@ app.use('/reply', function(req, res) {
   res.render('reply');
 });
 
+app.use('/about', function(req, res){
+ console.log("here we go");
+  res.render('about');
+});
+
+app.use('/features', function(req, res){
+ res.render('features');
+});
+
+app.use('/support', function(req, res){
+res.render('support');
+});
 
 // GET /auth/facebook
 //   Use passport.authenticate() as route middleware to authenticate the

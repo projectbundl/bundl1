@@ -3,6 +3,7 @@ var graph = require('fbgraph');
 exports.FBpostToFeedMessageAccessToken = function (mess, accessToken, callback) {
   graph.setAccessToken(accessToken);
   var temp = {'message':mess};
+  console.log('this is a warning message!');
   graph.post("/feed", temp , function(err, res) {
     if (res) {
       callback(err, res);

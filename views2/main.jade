@@ -1,47 +1,47 @@
 doctype html
 head
-  // meta(http-equiv='Content-Type', content='text/html; charset=utf-8')
-  title BUNDL
-  link(href='css/bundl_style.css', rel='stylesheet', type='text/css')
+    //meta(http-equiv='Content-Type', content='text/html; charset=utf-8')
+    title BUNDL
+    link(href='css/bundl_style.css', rel='stylesheet', type='text/css')
   body#home
     #bundl_wrapper
       #bundl_header
         #bundl_menu
           ul
             li
-              a(href='/index')
+              a(href='index.html')
                 span
                 | Home
             |                 
             li
-              a(href='/features')
+              a(href='features.html')
                 span
                 | Features
             |                 
             li
-              a(href='/support')
+              a(href='support.html')
                 span
                 | Support
             |                 
             li
-              a(href='/about')
+              a(href='about.html')
                 span
                 | About
         |  
         |         
         |         
         #bundl_title
-          .title
+          .title_dotted
             h1 WELCOME TO BUNDL
         // end of header
         #bundl_main
           #bundl_sidebar
             .promo_box
               h2 Our Latest Promotion
-              | 
+              | &#x9;&#x9;
               ul
                 li  WOW
-                |                 
+                |                 &#x9;
                 li  FREE STUFF
             |             
             |             
@@ -51,20 +51,20 @@ head
               ul
                 li BUNDL is #1 
                 |                     
-                li  Can't live without it
+                li  Cant live without it
                 |                     
                 li  Highly recommend it
-        |     
-        #signin_area
-          a(href='/auth/google')
-            img(src='images/g+.png', alt='google+ sign in')
-          a(href='/auth/facebook')  
-            img(src='images/fb.png', alt='facebook sign in')
-          br  
-          a(href='/auth/twitter')
-            img(src='images/tw.png', alt='twitter sign in')
-          a(href='/auth/blogger')
-            img(src='/', alt='somekind of signin')
+          |  
+          section
+            center
+              br
+              a(href='./postInfo.html')
+                img(src='./images/post2rep.png', alt='post2')
+                a
+                  br
+          |  
+          |     
+          a(href='http://www.plus.google.com')  google 
       // end of content
     // end of main
     // end of wrapper
@@ -72,3 +72,6 @@ head
       #bundl_footer
         | Copyright &copy; 2015 
         a(href='#') BUNDL
+    |     
+    |   
+    script(src='./js/mainPage.js')

@@ -14,7 +14,7 @@ exports.TWpullAllTweets = function(accessKey, accessSecret, callback) {
     access_token_secret: accessSecret
   });
 
-  client.get('statuses/user_timeline.json', {screen_name:'bundl_man'}, function(error, tweets, res) {
+  client.get('statuses/user_timeline.json', function(error, tweets, res) {
   //client.get('statuses/home_timeline', {count:1}, function(error, tweets, res) {
     if (error) throw error;
 
@@ -35,3 +35,17 @@ exports.TWtweet = function (message, accessKey, accessSecret, callback) {
   });
 
 };
+
+exports.TWComment = function(message, tweetID, accessKey, accessSecret, callback) {
+  var client = new Twitter({
+    consumer_key: TWITTER_CONSUMER_KEY,
+    consumer_secret: TWITTER_CONSUMER_SECRET,
+    access_token_key: accessKey,
+    access_token_secret:accessSecret
+  });
+
+  params = {'status':message, 'in_reply_to_status_id': tweetID};
+  client.post('statuses/update.json', params, function(error, res) {
+    callback(error, res);
+  });
+}

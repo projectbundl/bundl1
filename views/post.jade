@@ -1,59 +1,91 @@
-<!DOCTYPE html>
-<head>
-<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-<title>BUNDL</title>
-<link href="css/bundl_style.css" rel="stylesheet" type="text/css" />
+doctype html
+head
+  title BUNDL
+  link(href='css/bundl_style.css', rel='stylesheet', type='text/css')
+  body#home
+    #bundl_wrapper
+      #bundl_header
+        #bundl_menu
+          ul
+            li
+              a(href='/index.jade')
+                span
+                | Home
+            |                 
+            li
+              a(href='/features.jade')
+                span
+                | Features
+            |                 
+            li
+              a(href='/support.jade')
+                span
+                | Support
+            |                 
+            li
+              a(href='/about.jade')
+                span
+                | About
+        |  
+        |         
+        |         
+        #bundl_title
+          .title
+            h1 WELCOME TO BUNDL
+        // end of header
+        #bundl_main
+          #bundl_sidebar
+            #bundl_sidebar
+              .promo_box
+                a(href='./main')
+                  img(src='./images/feedButton.png', alt='Navigate to Feed')
+              |             
+              |             
+              .review_box
+                a(href='http://www.plus.google.com')
+                  img(src='images/google-plus.png', alt='Navigate to Google+')
+                br 
+                a(href='http://www.facebook.com')
+                  img(src='images/facebook.png', alt='Navigate to Facebook')
+                br
+                a(href='http://www.twitter.com')
+                  img(src='images/twitter.png', alt='Navigate to Twitter')
+                br
+                a(href='http://www.blogger.com')
+                  img(src='images/bloggr.png', alt='Navigate to Blogger')
+        br
+        |   
+        center
+          form(method="post", action="/post")
+            input(type='checkbox', name='sel', value='0')
+            | Select All
+            |       
+            input(type='checkbox', name='sel', value='1')
+            | Facebook
+            |       
+            input(type='checkbox', name='sel', value='google')
+            | Google+
+            |       
+            input(type='checkbox', name='sel', value='linkedin')
+            | Blogger
+            |       
+            input(type='checkbox', name='sel', value='2')
+            | Twitter
+            br
+            |     
+            br
+            br
+            textarea(name='postMessage', placeholder='Enter your message here...', cols='75', rows='10', autofocus=true, required)
+            div#submit
+              input(type='submit', value='Post!')
 
-     
-</head>
-<body id="home">
-<div id="bundl_wrapper">
-    <div id="bundl_header">
-        <div id="bundl_menu">
-            <ul>
-                <li><a href="index.jade"><span></span>Home</a></li>
-                <li><a href="features.jade"><span></span>Features</a></li>
-                <li><a href="support.jade"><span></span>Support</a></li>
-                <li><a href="about.jade"><span></span>About</a></li>
-            </ul>    	
-        </div> 
-        
-        <div id="bundl_title">
-       	  <div class="title_dotted">
-            <h1>WELCOME TO BUNDL</h1>
-	</div>
-    </div> <!-- end of header -->
-    
-
-
-<div id="bundl_main">
-    	
-   
- <form>
-      <input type="checkbox" name="sel" value="all">Select All&nbsp
-      <input type="checkbox" name="sel" value="facebook">Facebook&nbsp
-      <input type="checkbox" name="sel" value="google">Google+&nbsp
-      <input type="checkbox" name="sel" value="linkedin">LinkedIn&nbsp
-      <input type="checkbox" name="sel" value="twitter">Twitter<br>
-      <img src="./images/post.png" alt="Post">
-    <form> 
-    
-			</div>
-           
-        </div> <!-- end of content -->
-    </div> <!-- end of main -->
-    
-</div> <!-- end of wrapper -->
-<div id="bundl_footer_wrapper">
-    <div id="bundl_footer">
-        Copyright © 2015 <a href="#">BUNDL</a>
-    	 
-    </div>
-</div>    
-
-
-  <script src="./js/mainPage.js"></script>
-		
-</body>
-</html>
-
+    // end of content
+    // end of main
+    // end of wrapper
+    #bundl_footer_wrapper
+      #bundl_footer
+        | Copyright &copy; 2015 
+        a(href='#') BUNDL
+    |     
+    |   
+    script(src='./js/mainPage.js')
