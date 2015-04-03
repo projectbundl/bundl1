@@ -1,58 +1,130 @@
+doctype html
 head
-  title BUNDL Main
-  body
-    a(href='/') Logout!!
-    |   
-    center
-      img(src='./images/bundlLogo8.png', alt='BUNDL Logo')
-    |   
-    aside.links
-      a(href='./post')
-        img(src='./images/postButton.png', alt='Navigate to Post')
-      |     
-      a(href='http://www.plus.google.com')
-        img(src='./images/googleButton.png', alt='Navigate to Google+')
-      |     
-      a(href='http://www.facebook.com')
-        img(src='./images/facebookButton.png', alt='Navigate to Facebook')
-      |     
-      a(href='http://www.twitter.com')
-        img(src='./images/twitterButton.png', alt='Navigate to Twitter')
-      |     
-      a(href='http://www.linkedin.com')
-        img(src='./images/linkedInButton.png', alt='Navigate to LinkedIn')
-    |   
-    section
-      center
-        br
-        form
-        - for (var i=0; i<index.test.length; i++)
-           div.post
-             p  POST ##{i+1}
-             |  ID: #{index.test[i].postID}
-             br
-             |  AUTHOR: #{index.test[i].author}
-             br
-             |  MESSAGE: #{index.test[i].message}
-             br
-             |  TIME: #{index.test[i].time}
-             br
-             | COMMENT COUNT: #{index.test[i].commentCount}
-             - for (var j = 0; j < index.test[i].commentCount; j++)
-               div.comment
-                 p COMMENT ##{j+1}
-                 | ID: #{index.test[i].comments[j].postID}
-                 br
-                 | MESSAGE: #{index.test[i].comments[j].message} 
-                 br
-                 | AUTHOR: #{index.test[i].comments[j].author}
-           div.messageBox
-             form(method="post", action="/post")
-               input(type="text", value="#{index.test[i].postID}", name="id" hidden)
-               textarea(name="commentMessage")
-               div#submit
-                 input(type="submit", value="Submit")
-    footer
-    |   
-    script(src='./js/mainPage.js')
+  title BUNDL
+  link(href='css/bundl_style.css', rel='stylesheet', type='text/css')
+  link(href='css/main.css', rel='stylesheet', type='text/css')
+  body#home
+    #bundl_wrapper
+      #bundl_header
+        #bundl_menu
+          ul
+            li
+              a(href='/index')
+                span
+                | Home
+            |                 
+            li
+              a(href='/features')
+                span
+                | Features
+            |                 
+            li
+              a(href='/support')
+                span
+                | Support
+            |                 
+            li
+              a(href='/about')
+                span
+                | About
+        |  
+        |         
+        |         
+        #bundl_title
+          .title
+            h1 WELCOME TO BUNDL
+            .account_info
+              | WELCOME, #{name}  
+              br
+              | 
+              .logout
+                a(href='/') Logout! 
+        // end of header
+        #bundl_main
+          #bundl_sidebar
+            #bundl_sidebar
+              .promo_box
+                form(action='/post')
+                  input(type='submit', value='Make a post')
+              |             
+              |             
+              .review_box
+                a(href='http://www.plus.google.com')
+                  img(src='images/google-plus.png', alt='Navigate to Google+')
+                br
+                a(href='http://www.facebook.com')
+                  img(src='images/facebook.png', alt='Navigate to Facebook')
+                br
+                a(href='http://www.twitter.com')
+                  img(src='images/twitter.png', alt='Navigate to Twitter')
+                br     
+                a(href='http://www.blogger.com')
+                  img(src='images/bloggr.png', alt='Navigate to Blogger')
+          |  
+          section.content
+            br
+            form
+              if (errorMessage)
+                p There was an error: #{errorMessage}
+              else
+              - for (var i=0; i<index.test.length; i++)
+                 div.post
+                   br
+                   p  POST ##{i+1}
+                   |  ID: #{index.test[i].postID}
+                   br
+                   |  AUTHOR: #{index.test[i].author}
+                   br
+                   |  MESSAGE: #{index.test[i].message}
+                   br
+                   |  TIME: #{index.test[i].createdTimeString}
+                   br
+                   | COMMENT COUNT: #{index.test[i].commentCount}
+                   br
+                   | SOCIAL MEDIA: #{index.test[i].socialMedia}
+                   br
+                   | LIKES: #{index.test[i].like_count}
+                   br
+                 - for (var j = 0; j < index.test[i].commentCount; j++)
+                   div.comment
+                     p COMMENT ##{j+1}
+                     | ID: #{index.test[i].comments[j].postID}
+                     br
+                     | MESSAGE: #{index.test[i].comments[j].message}
+                     br
+                     | AUTHOR: #{index.test[i].comments[j].author}
+                     br
+                     | DATE: #{index.test[i].comments[j].timeString}
+                     br
+                     | Social Media: #{index.test[i].comments[j].socialMedia}
+                     br
+                     | LIKES: #{index.test[i].comments[j].like_count}
+                     br
+                   if (index.test[i].comments[j].socialMedia == 2)
+                     div.messageBox
+                       form(method="post", action="/bin/processComment")
+                         input(type="text", value="#{index.test[i].socialMedia}", name="smID" hi    dden)
+                         input(type="text", value="#{index.test[i].comments[j].postID}", name="id" hidden)
 
+                         textarea(type="text",name="commentMessage", value='@'+locals.index.test[i].comments[j].AUTHOR)
+                       div#submit
+                         input(type="submit", value="Submit")
+                    br
+                 if (index.test[i].socialMedia == 1)
+                   div.messageBox
+                     form(method="post", action="/bin/processComment")
+                       input(type="text", value="#{index.test[i].socialMedia}", name="smID" hidden)
+                       input(type="text", value="#{index.test[i].postID}", name="id" hidden)
+                       textarea(type="text",name="commentMessage", value='')
+                     div#submit
+                       input(type="submit", value="Submit")
+
+
+              
+      // end of content
+    // end of main
+    // end of wrapper
+    #bundl_footer_wrapper
+      #bundl_footer
+        | Copyright &copy; 2015 
+        a(href='#') BUNDL

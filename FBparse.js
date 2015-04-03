@@ -2,16 +2,16 @@ var Post = require('./CLSPost.js');
 //module that parses facebook data for messages
 module.exports = function (input){
   var messageArray= new Array();
-  //messageArray[0]='hello'; 
-  //console.log(input);
   var aryMess = input.data;
-  //console.log(aryMess);
-  //console.log('working module data:');
-  //console.log(input.length);  
- // console.log(input.data[0].comments.data);
+
   for (var i in aryMess) {
-    messageArray.push(new Post(aryMess[i]));
-    //messageArray.push(input.data[i].message);
+    aryMess[i].socialMedia = 1;
+    if (aryMess[i].hasOwnProperty('likes')) {
+      aryMess[i].like_count = aryMess[i].likes.data.length; 
+    } else {
+      aryMess[i].like_count = 0;
+    }
+    messageArray.push(new Post(aryMess[i])); 
   }
   return messageArray;
 };

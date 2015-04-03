@@ -1,24 +1,67 @@
+doctype html
 head
-  title BUNDL Reply
-  body
-    center
-      img(src='./images/bundlLogo5.png', alt='BUNDL Logo')
-    |   
-    aside.links
-      a(href='./main')
-        img(src='./images/feedButton.png', alt='Navigate to Feed')
-      |     
-      a(href='http://www.plus.google.com')
-        img(src='./images/googleButton.png', alt='Navigate to Google+')
-      |     
-      a(href='http://www.facebook.com')
-        img(src='./images/facebookButton.png', alt='Navigate to Facebook')
-      |     
-      a(href='http://www.twitter.com')
-        img(src='./images/twitterButton.png', alt='Navigate to Twitter')
-      |     
-      a(href='http://www.linkedin.com')
-        img(src='./images/linkedInButton.png', alt='Navigate to LinkedIn')
-    |   
-    section
-      img(src='./images/post.png', alt='Post')
+  title BUNDL
+  link(href='css/bundl_style.css', rel='stylesheet', type='text/css')
+  body#home
+    #bundl_wrapper
+      #bundl_header
+        #bundl_menu
+          ul
+            li
+              a(href='/index.jade')
+                span
+                | Home
+            |                 
+            li
+              a(href='/features.jade')
+                span
+                | Features
+            |                 
+            li
+              a(href='/support.jade')
+                span
+                | Support
+            |                 
+            li
+              a(href='/about.jade')
+                span
+                | About
+        |  
+        |         
+        |         
+        #bundl_title
+          .title
+            h1  BUNDL
+        // end of header
+        #bundl_main
+          #bundl_sidebar
+            #bundl_sidebar
+              .promo_box
+                form(action='/main.jade')
+                  input(type='submit', value='Home')
+              |             
+              |             
+              .review_box
+                a(href='http://www.plus.google.com')
+                  img(src='images/google-plus.png', alt='Navigate to Google+')
+                br     
+                a(href='http://www.facebook.com')
+                  img(src='images/facebook.png', alt='Navigate to Facebook')
+                br     
+                a(href='http://www.twitter.com')
+                  img(src='images/twitter.png', alt='Navigate to Twitter')
+                br     
+                a(href='http://www.blogger.com')
+                  img(src='images/bloggr.png', alt='Navigate to Blogger')
+        br
+        |   
+        center
+          section
+            img(src='./images/post.png', alt='Post')
+    // end of content
+    // end of main
+    // end of wrapper
+    #bundl_footer_wrapper
+      #bundl_footer
+        | Copyright &copy; 2015 
+        a(href='#') BUNDL
