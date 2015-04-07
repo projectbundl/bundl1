@@ -5,11 +5,16 @@ var express = require('express')
   , https = require('https')
   , creds = require("./creds")
   , passport = require('passport')
+  , google = require('googleapis')
+  , OAuth2 = google.OAuth2Client
   , FacebookStrategy = require('passport-facebook').Strategy
   , TwitterStrategy = require('passport-twitter').Strategy
+  , GoogleStrategy = require('passport-google-oauth').OAuth2Strategy
   , session = require('express-session')
   , bodyParser = require("body-parser")
   , cookieParser = require("cookie-parser")
+  , morgan = require('morgan')
+  , logout = require('express-passport-logout')
   , fbParser = require('./FBparse.js')
   , twParser = require('./TWparse.js')
   , fbFunctions = require('./FBFunctions.js')
@@ -19,9 +24,12 @@ var FACEBOOK_APP_ID = creds.fb.id;
 var FACEBOOK_APP_SECRET = creds.fb.secret;
 var TWITTER_CONSUMER_KEY = creds.tw.id;
 var TWITTER_CONSUMER_SECRET = creds.tw.secret;
+var GOOGLE_APP_ID = creds.gPlus.id;
+var GOOGLE_APP_SECRET = creds.gPlus.secret;
 
 // Express Configuration
 var app = express();
+app.use(morgan('dev'));
 app.use(bodyParser.urlencoded({extended:true}));
 app.use(bodyParser.json());
 app.use(express.static(__dirname + '/public'));
@@ -35,7 +43,7 @@ app.use(sessionStore);
 app.use(passport.initialize());
 app.use(passport.session());
 
-
+/*
 // Log all server requests
 app.use(function(req, res, next) {
   console.log('%s %s', req.method, req.url);
@@ -51,6 +59,7 @@ app.use(function(req, res, next) {
 
   next();
 });
+*/
 
 // Passport session setup.
 //   To support persistent login sessions, Passport needs to be able to
@@ -83,12 +92,32 @@ passport.use('twitter', new TwitterStrategy({
       //User.findOrCreate(..., function(err, user) {
       //if (err) { return done(err); }
       
-      // lookup user in DB
       passport._strategies.twitter._oauth.name = profile.displayName;
       passport._strategies.twitter._oauth.accessToken = accessToken;
       passport._strategies.twitter._oauth.tokenSecret = tokenSecret;
       return done(null, profile);
     //});
+    });
+  }
+));
+
+passport.use('google', new GoogleStrategy({
+  clientID: GOOGLE_APP_ID,
+  clientSecret: GOOGLE_APP_SECRET,
+  callbackURL: 'https://babbage.hbg.psu.edu:6395/auth/google/callback',
+  scope: ['profile', 'email', 'openid', 'https://www.googleapis.com/auth/plus.stream.read', 'https://www.googleapis.com/auth/plus.me'],
+  accessType: 'offline',
+  approvalPrompt: 'force'
+  }, 
+  function(accessToken, refreshToken, profile, done) {
+    process.nextTick(function() {
+      console.log(profile);
+      console.log(accessToken);
+      console.log(refreshToken);
+      passport._strategies.google._oauth2.accessToken = accessToken;
+      passport._strategies.google._oauth2.refreshToken = refreshToken;
+
+      return done(null, profile);
     });
   }
 ));
@@ -231,11 +260,33 @@ app.use('/main', function(req, res) {
     });
   }
 
+  if (passport._strategies.google._oauth2.hasOwnProperty('_clientId')) {
+    var plus = google.plusDomains('v1');
+    asyncTasks.push(function(gpasynccallback) {
+      var oauth2Client = new google.auth.OAuth2(passport._strategies.google._oauth2._clientId, passport._strategies.google._oauth2._clientSecret);
+
+
+      oauth2Client.setCredentials({access_token: passport._strategies.google._oauth2.accessToken});
+      /*
+      plus.activities.list({userId: 'me', collection: 'public', auth: oauth2Client}, function(err, user) {
+        console.log(user);
+        gpasynccallback();
+      });
+     */
+      plus.activities.list({userId: passport._strategies.google._oauth2._clientId, collection: 'user', auth:oauth2Client}, function(err, res) {
+        console.log(err);
+        console.log("I'm here" + res);
+        gpasynccallback();
+      });
+    });
+  }
+
   async.parallel(asyncTasks, function() {
     // combine posts here!!!
     var output;
     if (twitterResults && facebookResults) {
-      output = twitterResults.concat(facebookResults);
+      output = combineLists(twitterResults, facebookResults);
+      //output = twitterResults.concat(facebookResults);
     } else if (twitterResults) {
       output = twitterResults;
     } else {
@@ -251,6 +302,43 @@ app.use('/main', function(req, res) {
 
 });
 
+var combineLists = function(twitterPosts, facebookPosts) {
+  var output = new Array();
+  var twCount = twitterPosts.length;
+  var fbCount = facebookPosts.length;
+  var currentTWPosition = 0;
+  var currentFBPosition = 0;
+
+  while (currentTWPosition < twCount && currentFBPosition < fbCount) {
+    // combine post
+    if (twitterPosts[currentTWPosition].message == facebookPosts[currentFBPosition].message) {
+      var temp = twitterPosts[currentTWPosition];
+      temp.message = "There was a combined SM " + twitterPosts[currentTWPosition].message;
+      output.push(temp);
+      currentTWPosition++;
+      currentFBPosition++;
+    } else {
+      if (twitterPosts[currentTWPosition].updatedTimeValue > facebookPosts[currentFBPosition].updatedTimeValue) {
+        output.push(twitterPosts[currentTWPosition]);
+        currentTWPosition++;
+      } else {
+        output.push(facebookPosts[currentFBPosition]);
+        currentFBPosition++;
+      }
+    }
+  }
+
+  while (currentTWPosition < twCount) {
+    output.push(twitterPosts[currentTWPosition]);
+    currentTWPosition++;
+  }
+  while (currentFBPosition < fbCount) {
+    output.push(facebookPosts[currentFBPosition]);
+    currentFBPosition++;
+  }
+  return output;
+}
+
 app.use('/postInfo', function(req, res) {
   res.render('postInfo');
 });
@@ -260,7 +348,6 @@ app.use('/reply', function(req, res) {
 });
 
 app.use('/about', function(req, res){
- console.log("here we go");
   res.render('about');
 });
 
@@ -281,6 +368,7 @@ app.get('/auth/facebook', passport.authenticate('facebook'), function (req, res)
 
 app.get('/auth/twitter' , passport.authenticate('twitter'), function(req, res) {});
 
+app.get('/auth/google', passport.authenticate('google'), function(req, res) {});
 
 // GET /auth/facebook/callback
 //   Use passport.authenticate() as route middleware to authenticate the
@@ -288,21 +376,30 @@ app.get('/auth/twitter' , passport.authenticate('twitter'), function(req, res) {
 //   login page.  Otherwise, the primary route function function will be called,
 //   which, in this example, will redirect the user to the home page.
 app.get('/auth/facebook/callback', 
-  passport.authenticate('facebook', { failureRedirect: '/index', successRedirect:'/main'}));
+  passport.authenticate('facebook', { successRedirect: '/main', failureRedirect:'/index' }));
 
 app.get('/auth/twitter/callback', 
   passport.authenticate('twitter', { successRedirect: '/main', failureRedirect: '/index' }));
 
+app.get('/auth/google/callback',
+  passport.authenticate('google', { successRedirect: '/main', failureRedirect: '/index' }));
+
 
 app.get('/logout', function(req, res){
-  req.session = null;
+  req.logOut();
+  req.session.destroy();
+  //req.session.save();
+  console.log('logged out??');
   res.redirect('index');
+  //req.session = null;
+  //res.redirect('index');
   //req.session.destroy(function(err) {
   //  res.redirect('index');
   //});
   //req.logout();
   //res.render('index');
 });
+
 
 // Server Setup
 var options = {
