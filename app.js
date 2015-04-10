@@ -6,6 +6,7 @@ var express = require('express')
   , creds = require("./creds")
   , passport = require('passport')
   , google = require('googleapis')
+  , fbGraph = require('fbgraph')
   , OAuth2 = google.OAuth2Client
   , FacebookStrategy = require('passport-facebook').Strategy
   , TwitterStrategy = require('passport-twitter').Strategy
@@ -17,8 +18,11 @@ var express = require('express')
   , logout = require('express-passport-logout')
   , fbParser = require('./FBparse.js')
   , twParser = require('./TWparse.js')
+  , gpParser = require('./GPparse.js')
   , fbFunctions = require('./FBFunctions.js')
-  , twFunctions = require('./TWFunctions.js');
+  , twFunctions = require('./TWFunctions.js')
+  , gpFunctions = require('./GPFunctions.js')
+  , combineLists = require('./combineFunctions.js');
 
 var FACEBOOK_APP_ID = creds.fb.id;
 var FACEBOOK_APP_SECRET = creds.fb.secret;
@@ -33,7 +37,7 @@ app.use(morgan('dev'));
 app.use(bodyParser.urlencoded({extended:true}));
 app.use(bodyParser.json());
 app.use(express.static(__dirname + '/public'));
-app.use(express.static(__dirname + '/viewws'));
+app.use(express.static(__dirname + '/views'));
 app.set('view engine', 'jade');
 app.use(cookieParser());
 
@@ -111,11 +115,9 @@ passport.use('google', new GoogleStrategy({
   }, 
   function(accessToken, refreshToken, profile, done) {
     process.nextTick(function() {
-      console.log(profile);
-      console.log(accessToken);
-      console.log(refreshToken);
       passport._strategies.google._oauth2.accessToken = accessToken;
       passport._strategies.google._oauth2.refreshToken = refreshToken;
+      passport._strategies.google._oauth2.name = profile.displayName;
 
       return done(null, profile);
     });
@@ -127,21 +129,21 @@ passport.use('facebook', new FacebookStrategy({
   clientID: FACEBOOK_APP_ID,
   clientSecret: FACEBOOK_APP_SECRET,
   callbackURL: "https://babbage.hbg.psu.edu:6395/auth/facebook/callback",
-  scope: ['publish_stream','read_stream', 'publish_actions', 'public_profile'] },
+  scope: ['user_events', 'publish_pages', 'manage_pages', 'user_photos', 'publish_stream','read_stream', 'publish_actions', 'public_profile'] },
   function(accessToken, refreshToken, profile, done) {
     // asynchronous verification, for effect...
     process.nextTick(function () {
-    // To keep the example simple, the user's Facebook profile is returned to
-    // represent the logged-in user.  In a typical application, you would want
-    // to associate the Facebook account with a user record in your database,
-    // and return that user instead.
-      
-    // Can create our own cookie after user validation/ combine social media info from db
-    // http://zipplease.tumblr.com/post/34169331215/node-js-session-management-with-express
-    passport._strategies.facebook._oauth2.name = profile.displayName;
-    passport._strategies.facebook._oauth2.accessToken = accessToken;
-    passport._strategies.facebook._oauth2.profileID = profile.id;
-    return done(null, profile);
+      // To keep the example simple, the user's Facebook profile is returned to
+      // represent the logged-in user.  In a typical application, you would want
+      // to associate the Facebook account with a user record in your database,
+      // and return that user instead.
+        
+      // Can create our own cookie after user validation/ combine social media info from db
+      // http://zipplease.tumblr.com/post/34169331215/node-js-session-management-with-express
+      passport._strategies.facebook._oauth2.name = profile.displayName;
+      passport._strategies.facebook._oauth2.accessToken = accessToken;
+      passport._strategies.facebook._oauth2.profileID = profile.id;
+      return done(null, profile);
     });
   }
 ));
@@ -183,14 +185,17 @@ app.route('/post')
       if (selection.indexOf('0') > -1 || selection.indexOf('1') > -1) {
         if (passport._strategies.facebook._oauth2.hasOwnProperty('accessToken')) {
           // Submit post
+         
           asyncSubmitPosts.push(function(fbAsyncCallback) {
-            fbFunctions.FBpostToFeedMessageAccessToken(postMessage, passport._strategies.facebook._oauth2.accessToken, fbcallback);
-
-            function fbcallback(err, facebook){
-              if (err) errorMessage += "Yo there was an error submitting your Facebook Post\n";
-              fbAsyncCallback();
-            }
-          });
+            fbFunctions.FBpostToFeedMessageAccessToken(postMessage, req.body.picture, passport._strategies.facebook._oauth2.accessToken, fbcallpix);
+              function fbcallpix(err2, facebook2){
+             // console.log(err2);
+               console.log("yep");
+                fbAsyncCallback();
+              }
+             
+            });
+          
         } else {
           // unauthorized
           errorMessage += "Yo you do not have access to post to Facebook!\n";
@@ -231,6 +236,7 @@ app.use('/error', function(req, res) {
 app.use('/main', function(req, res) {
   var facebookResults;
   var twitterResults;
+  var googleResults;
   var userName;
   var asyncTasks = [];
 
@@ -260,84 +266,32 @@ app.use('/main', function(req, res) {
     });
   }
 
-  if (passport._strategies.google._oauth2.hasOwnProperty('_clientId')) {
-    var plus = google.plusDomains('v1');
+  if (passport._strategies.google._oauth2.hasOwnProperty('accessToken')) {
     asyncTasks.push(function(gpasynccallback) {
-      var oauth2Client = new google.auth.OAuth2(passport._strategies.google._oauth2._clientId, passport._strategies.google._oauth2._clientSecret);
+      gpFunctions.GPpullAllPosts(passport._strategies.google._oauth2._clientId, passport._strategies.google._oauth2._clientSecret, passport._strategies.google._oauth2.accessToken, gpcallback);
 
-
-      oauth2Client.setCredentials({access_token: passport._strategies.google._oauth2.accessToken});
-      /*
-      plus.activities.list({userId: 'me', collection: 'public', auth: oauth2Client}, function(err, user) {
-        console.log(user);
-        gpasynccallback();
-      });
-     */
-      plus.activities.list({userId: passport._strategies.google._oauth2._clientId, collection: 'user', auth:oauth2Client}, function(err, res) {
-        console.log(err);
-        console.log("I'm here" + res);
-        gpasynccallback();
-      });
+      function gpcallback(err, google) {
+        gpParser(google, passport._strategies.google._oauth2._clientId, passport._strategies.google._oauth2._clientSecret, passport._strategies.google._oauth2.accessToken, function(results) {
+          googleResults = results;       
+          userName = passport._strategies.google._oauth2.name;
+          gpasynccallback();
+        });
+      }
     });
   }
 
   async.parallel(asyncTasks, function() {
-    // combine posts here!!!
-    var output;
-    if (twitterResults && facebookResults) {
-      output = combineLists(twitterResults, facebookResults);
-      //output = twitterResults.concat(facebookResults);
-    } else if (twitterResults) {
-      output = twitterResults;
-    } else {
-      output = facebookResults;
-    }
-    //output.sort(function(a, b) { return b['updatedTimeValue'] - a['updatedTimeValue']});
+    // combine posts here!!
+    var output = combineLists.combineLists(twitterResults, facebookResults, googleResults);
+
     if (req.query['error'] !== 'undefined') {
       res.render('main', {'errorMessage':req.query['error'], index:{test: output}, 'name':userName});
     } else {
       res.render('main', {'errorMessage':'', index:{test: output}, 'name':userName});
     }
   });
-
 });
 
-var combineLists = function(twitterPosts, facebookPosts) {
-  var output = new Array();
-  var twCount = twitterPosts.length;
-  var fbCount = facebookPosts.length;
-  var currentTWPosition = 0;
-  var currentFBPosition = 0;
-
-  while (currentTWPosition < twCount && currentFBPosition < fbCount) {
-    // combine post
-    if (twitterPosts[currentTWPosition].message == facebookPosts[currentFBPosition].message) {
-      var temp = twitterPosts[currentTWPosition];
-      temp.message = "There was a combined SM " + twitterPosts[currentTWPosition].message;
-      output.push(temp);
-      currentTWPosition++;
-      currentFBPosition++;
-    } else {
-      if (twitterPosts[currentTWPosition].updatedTimeValue > facebookPosts[currentFBPosition].updatedTimeValue) {
-        output.push(twitterPosts[currentTWPosition]);
-        currentTWPosition++;
-      } else {
-        output.push(facebookPosts[currentFBPosition]);
-        currentFBPosition++;
-      }
-    }
-  }
-
-  while (currentTWPosition < twCount) {
-    output.push(twitterPosts[currentTWPosition]);
-    currentTWPosition++;
-  }
-  while (currentFBPosition < fbCount) {
-    output.push(facebookPosts[currentFBPosition]);
-    currentFBPosition++;
-  }
-  return output;
-}
 
 app.use('/postInfo', function(req, res) {
   res.render('postInfo');
@@ -411,7 +365,6 @@ var server = https.createServer(options, app).listen(3000);
 app.use('/', function(req, res) {
   res.render('index');
 });
-
 
 // Simple route middleware to ensure user is authenticated.
 //   Use this route middleware on any resource that needs to be protected.  If

@@ -1,10 +1,34 @@
-html
-  head
-    link(rel='stylesheet', type='text/css', href='bundl_style./css/.css')
-  body
-    center
-      img(src='./images/bundlLogo.png', alt='BUNDLe Logo')
-    
+doctype html
+head
+  title BUNDL
+  link(href='css/bundl_style.css', rel='stylesheet', type='text/css')
+  body#home
+    #bundl_wrapper
+      #bundl_header
+        #bundl_menu
+          ul
+            li
+              a(href='/index')
+                span
+                | Home
+            |                 
+            li
+              a(href='/features')
+                span
+                | Features
+            |                 
+            li
+              a(href='/support')
+                span
+                | Support
+            |                 
+            li
+              a(href='/about')
+                span
+                | About
+   
+           
+  
       p
       |This is a page about us.
       |Some text here. Some more text here. ETC... 

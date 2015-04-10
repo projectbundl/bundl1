@@ -1,6 +1,5 @@
 doctype html
 head
-  // meta(http-equiv='Content-Type', content='text/html; charset=utf-8')
   title BUNDL
   link(href='css/bundl_style.css', rel='stylesheet', type='text/css')
   body#home
@@ -58,13 +57,28 @@ head
         #signin_area
           a(href='/auth/google')
             img(src='images/g+.png', alt='google+ sign in')
+          | &nbsp; &nbsp; &nbsp;
+          a(href='/auth/git')
+            img(src='images/gh.png', alt='github sign in')
+          br
           a(href='/auth/facebook')  
             img(src='images/fb.png', alt='facebook sign in')
+          | &nbsp; &nbsp; &nbsp;
+          a(href='/auth/tumblr')
+            img(src='images/tb.png', alt='tumblr sign in')
           br  
           a(href='/auth/twitter')
             img(src='images/tw.png', alt='twitter sign in')
-          a(href='/auth/blogger')
-            img(src='/', alt='somekind of signin')
+          | &nbsp; &nbsp; &nbsp;
+          a(href='/auth/twitter')
+            img(src='images/rd.png', alt='reddit sign in')
+          br  
+          a(href='/auth/linkedin')
+            img(src='/images/li.png', alt='linkedin sign in')
+          | &nbsp; &nbsp; &nbsp;
+          a(href='/auth/pinterest')
+            img(src='/images/pt.png', alt='pinterest sign in')
+
       // end of content
     // end of main
     // end of wrapper

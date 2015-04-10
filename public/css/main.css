@@ -10,7 +10,15 @@ body {
 
 }
 
+.holder {
+  border: 1px solid blue;
+  margin: 5px;
+}
 
+.post {
+  border: 1px dash;
+  margin: 3px;
+}
 .content {
   float:right;
   width:70%;
@@ -19,4 +27,5 @@ body {
 
 #bundl_sidebar {
   position: fixed;
+
 }

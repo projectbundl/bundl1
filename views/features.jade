@@ -1,12 +1,70 @@
-html
-  head
-    link(rel='stylesheet', type='text/css', href='bundl_style./css/.css')
-  body
-    center
-      img(src='./images/bundlLogo.png', alt='BUNDLe Logo')
-    
-      p
-      |This is a page about us.
-      |Some text here. Some more text here. ETC... 
-      br
-   
+doctype html
+
+head
+  title BUNDL
+  link(href='css/bundl_style.css', rel='stylesheet' type='text/css')
+  center
+   body#home
+    #bundl_wrapper
+      #bundl_header
+        #bundl_menu
+          ul
+            li
+              a(href='/index')
+                span
+                | Home
+            |                 
+            li
+              a(href='/features')
+                span
+                | Features
+            |                 
+            li
+              a(href='/support')
+                span
+                | Support
+            li
+              a(href='/about')
+                span
+                | About
+        |  
+        |         
+        |         
+        #bundl_title
+          .title
+            h1 WELCOME TO BUNDL
+        // end of header
+        #bundl_main
+         #bundl_sidebar
+           #signin_area
+           a(href='http://www.plus.google.com')
+            img(src='images/google-plus.png', alt='Navigate to Google+')
+           br
+           a(href='http://www.facebook.com')
+            img(src='images/facebook.png', alt='Navigate to Facebook')
+           br
+           a(href='http://twitter.com')
+            img(src='images/twitter.png', alt='Navigate to Twitter')
+           br
+           a(href='http://www.linkedin.com')
+            img(src='images/linkedin.png', alt='Navigate to LinkedIn')
+           br         
+         section.content
+            p
+            |More than 1.7 billion people use various methods of social media today.  It has grown from a way to keep in
+            |touch with family or meet new people, to a powerful tool for businesses to harness massive amounts of data.  
+            |Those ies as well as individuals, spend more time navigating the hundreds of social media outlets than 
+            |any other internet activity.  Wouldn’t it be nice to have a single location where all the information from those 
+            |sites could be brought together?
+            p
+            |BUNDL is a management website designed to integrate the information and features of various social media 
+            |outlets. Its primary goal is to give people an efficient and user-friendly way to post information as well as 
+            |monitor replies and messages in a single cohesive application.  
+            |The main features of BUNDL will include: Posting to multiple social media outlets at the same time, pulling 
+            |replies and comments from various media that apply to the same message (even from different sources) into a 
+            |single easy to navigate interface, manage formatting differences between different media without user 
+            |interaction, and supply a host of data analysis tools that would allow companies to discover deep correlations 
+            |between their customers and products to increase marketing potential.
+            |BUNDL would alleviate the need for the entire world to spend time juggling a multitude of different websites,
+            |and instead let them focus on what is really important: their message.
+
