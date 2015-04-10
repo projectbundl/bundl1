@@ -25,7 +25,8 @@
     "express-passport-logout": "~0.1.0",
     "googleapis": "~2.0.2",
     "node-google-api": "~0.3.0",
-    "request": "~2.55.0"
+    "request": "~2.55.0",
+    "multer": "~0.1.8"
   },
   "devDependencies": {},
   "scripts": {

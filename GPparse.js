@@ -17,7 +17,7 @@ module.exports = function(input, clientID, clientSecret, accessToken, retCallbac
             console.log(err);
           }
           else {
-            var temp = {'from':{'name':input[dex].actor.displayName}, 'message':input[dex].object.content, 'id':input[dex].actor.id, 'like_count':input[dex].object.plusoners.totalItems,'createdTimeString':input[dex].published, 'updatedTimeString':input[dex].updated, 'comments':input[dex].object.replies.totalItems, 'socialMedia':3, 'theCommentArray':input[dex]};
+            var temp = name(input, dex);
             messageArray[dex] = new Post(temp);
           }
           console.log(ctr == input.length);
@@ -28,12 +28,31 @@ module.exports = function(input, clientID, clientSecret, accessToken, retCallbac
       })());
 
     } else {
-console.log('else:', ctr);
+      //console.log('else:', ctr);
       ctr++;
-      var temp = {'from':{'name':input[index].actor.displayName}, 'message':input[index].object.content, 'id':input[index].actor.id, 'like_count':input[index].object.plusoners.totalItems,'createdTimeString':input[index].published, 'updatedTimeString':input[index].updated, 'comments':input[index].object.replies.totalItems, 'socialMedia':3, 'theCommentArray':input[index]}
       messageArray[index] = new Post(temp);
+      var temp = name(input, index);
     }
   }
 };
 
+function name (input, index){
+ return 'from':{'name':input[index].actor.displayName}, 'message':input[index].object.content, 'id':input[index].actor.id, 'like_count':input[index].object.plusoners.totalItems,'createdTimeString':input[index].published, 'updatedTimeString':input[index].updated, 'comments':input[index].object.replies.totalItems, 'socialMedia':3, 'theCommentArray':commentParse(input[index]);
+}
 
+function commentParse (commentArray){
+  var newComments = new Array();
+
+  for(var comment in commentArray){
+    newComments[comment].author = commentArray[comment].displayName;
+    newComments[comment].message = commentArray[comment].object.content;
+    newComments[comment].postID = commentArray[comment].inReplyTo[0].id;
+    newComments[comment].likes = commentArray[comment].plusoners;
+    newComments[comment].timeString = commentArray[comment].updated;
+    newComments[comment].timeValue = Date.parse(commentArray[comment].updated);
+    newComments[comment].socialMedia = 3;
+  }
+
+  return newComments;
+
+}
