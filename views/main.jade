@@ -56,65 +56,65 @@ div
                 br
                 br
                 br
-        br
-        |  
-        section.content
-          if (errorMessage)
-            p There was an error: #{errorMessage}
-          else
-            each post, pdex in index.test
-              div.holder
-                div.post
+      br
+      |  
+      section.content
+        if (errorMessage)
+          p There was an error: #{errorMessage}
+        else
+          each post, pdex in index.test
+            div.holder
+              div.post
+                br
+                p  POST #{pdex+1} 
+                |  ID: #{post.postID}
+                br
+                |  AUTHOR: #{post.author}
+                br
+                |  MESSAGE: #{post.message}
+                br
+                |  TIME: #{post.createdTimeString}
+                br
+                | COMMENT COUNT: #{post.commentCount}
+                br
+                | SOCIAL MEDIA: #{post.socialMedia}
+                br
+                | LIKES: #{post.like_count}
+                br
+              each comment, dex in post.comments
+                div.comment
+                  p COMMENT #{dex+1}
+                  | ID: #{comment.postID}
                   br
-                  p  POST #{pdex+1} 
-                  |  ID: #{post.postID}
+                  | MESSAGE: #{comment.message}
                   br
-                  |  AUTHOR: #{post.author}
+                  | AUTHOR: #{comment.author}
                   br
-                  |  MESSAGE: #{post.message}
+                  | DATE: #{comment.timeString}
                   br
-                  |  TIME: #{post.createdTimeString}
+                  | Social Media: #{comment.socialMedia}
                   br
-                  | COMMENT COUNT: #{post.commentCount}
+                  | LIKES: #{comment.like_count}
                   br
-                  | SOCIAL MEDIA: #{post.socialMedia}
-                  br
-                  | LIKES: #{post.like_count}
-                  br
-                each comment, dex in post.comments
-                  div.comment
-                    p COMMENT #{dex+1}
-                    | ID: #{comment.postID}
-                    br
-                    | MESSAGE: #{comment.message}
-                    br
-                    | AUTHOR: #{comment.author}
-                    br
-                    | DATE: #{comment.timeString}
-                    br
-                    | Social Media: #{comment.socialMedia}
-                    br
-                    | LIKES: #{comment.like_count}
-                    br
-                  if (comment.socialMedia == 2)
-                    div.messageBox
-                      form(method="post", action="/bin/processComment")
-                        input(type="text", value="#{comment.socialMedia}", name="smID" hidden)
-                        input(type="text", value="#{comment.postID}", name="id" hidden)
-
-                        textarea(type="text",name="commentMessage", value='@'+comment.author)
-                      div#submit
-                        input(type="submit", value="Submit")
-                   br
-                if (post.socialMedia == 1)
+                if (comment.socialMedia == 2)
                   div.messageBox
                     form(method="post", action="/bin/processComment")
-                      input(type="text", value="#{post.socialMedia}", name="smID" hidden)
-                      input(type="text", value="#{post.postID}", name="id" hidden)
-                      textarea(type="text",name="commentMessage", value='')
+                      input(type="text", value="#{comment.socialMedia}", name="smID" hidden)
+                      input(type="text", value="#{comment.postID}", name="id" hidden)
+
+                      textarea(type="text",name="commentMessage", value='@'+comment.author)
                     div#submit
-                       input(type="submit", value="Submit")
-         
+                      input(type="submit", value="Submit")
+                 br
+              if (post.socialMedia == 1)
+                div.messageBox
+                  form(method="post", action="/bin/processComment")
+                    input(type="text", value="#{post.socialMedia}", name="smID" hidden)
+                    input(type="text", value="#{post.postID}", name="id" hidden)
+                    textarea(type="text",name="commentMessage", value='')
+                  div#submit
+                     input(type="submit", value="Submit")
+       
   footer
    #bundl_footer_wrapper
     #bundl_footer

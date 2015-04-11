@@ -3,6 +3,7 @@ var express = require('express')
   , compression = require('compression')
   , async = require('async')
   , fs = require('fs')
+  , multer = require('multer')
   , https = require('https')
   , creds = require("./creds")
   , passport = require('passport')
@@ -34,6 +35,7 @@ var GOOGLE_APP_SECRET = creds.gPlus.secret;
 
 // Express Configuration
 var app = express();
+app.use(multer({dest:'./public/uploads'}));
 app.use(compression());
 app.use(morgan('dev'));
 app.use(bodyParser.urlencoded({extended:true}));
@@ -183,20 +185,29 @@ app.route('/post')
       var asyncSubmitPosts = [];
       var errorMessage = '';
 
-
       if (selection.indexOf('0') > -1 || selection.indexOf('1') > -1) {
         if (passport._strategies.facebook._oauth2.hasOwnProperty('accessToken')) {
+
           // Submit post
-         
-          asyncSubmitPosts.push(function(fbAsyncCallback) {
-            fbFunctions.FBpostToFeedMessageAccessToken(postMessage, req.body.picture, passport._strategies.facebook._oauth2.accessToken, fbcallpix);
-              function fbcallpix(err2, facebook2){
-             // console.log(err2);
-               console.log("yep");
+          if (Object.getOwnPropertyNames(req.files).length !== 0) {
+            asyncSubmitPosts.push(function(fbAsyncCallback) {
+              fbFunctions.FBpostToFeedMessageAccessToken(postMessage, 'https://babbage.hbg.psu.edu:6395/uploads/' + req.files.fileName.name, passport._strategies.facebook._oauth2.accessToken, fbcallbackpix);
+
+
+              function fbcallbackpix(err3, facebook3) {
                 fbAsyncCallback();
               }
-             
             });
+          } else {
+         
+            asyncSubmitPosts.push(function(fbAsyncCallback) {
+              fbFunctions.FBpostToFeedMessageAccessToken(postMessage, req.body.picture, passport._strategies.facebook._oauth2.accessToken, fbcallpix);
+              function fbcallpix(err2, facebook2){
+                fbAsyncCallback();
+              }
+               
+            });
+          }
           
         } else {
           // unauthorized
