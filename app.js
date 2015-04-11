@@ -1,5 +1,6 @@
 // set variables for environment
 var express = require('express')
+  , compression = require('compression')
   , async = require('async')
   , fs = require('fs')
   , https = require('https')
@@ -33,6 +34,7 @@ var GOOGLE_APP_SECRET = creds.gPlus.secret;
 
 // Express Configuration
 var app = express();
+app.use(compression());
 app.use(morgan('dev'));
 app.use(bodyParser.urlencoded({extended:true}));
 app.use(bodyParser.json());
@@ -340,11 +342,10 @@ app.get('/auth/google/callback',
 
 
 app.get('/logout', function(req, res){
-  req.logOut();
   req.session.destroy();
+  req.logOut();
+  res.redirect('/');
   //req.session.save();
-  console.log('logged out??');
-  res.redirect('index');
   //req.session = null;
   //res.redirect('index');
   //req.session.destroy(function(err) {

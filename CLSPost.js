@@ -15,33 +15,22 @@ function Post(obj) {
 }
 
 function commentCountFunction(list) {
-  if (typeof list.comments!=="undefined") {
-    if(list.socialMedia==1){return list.comments.data.length;}
-    else if(list.socialMedia==3){return list.comments;}
-    }
-  else {return 0;}
+  if (typeof list.comments !== "undefined") {
+    return list.comments.data.length;
+  } else {
+    return 0;
+  }
 }
 
 function createCommentList(commentList, socialMedia){
-  if(typeof commentList.comments ==="undefined") {return [];}
-  else{
+  if (typeof commentList.comments ==="undefined") {return [];}
+  else {
     var commentArray = [];
 
-    if (socialMedia == 3) {
-     for(var y in commentList.theCommentArray){
-      //if(commentList.comments!==0){
-        
-        //var temp = {'from':{'name':
-        //commentArray.push(new Comment(commentList.theCommentArray[y]));
-       //where the hell is theCommentArray defined? cant find it. unless you meant messageArray??? 
-     }
-    }
-    else{
-      for (var i in commentList.comments.data){
-        commentList.comments.data[i].socialMedia = socialMedia;
-        commentArray.push(new Comment(commentList.comments.data[i]));
-      } 
-    }
+    for (var i in commentList.comments.data){
+      commentList.comments.data[i].socialMedia = socialMedia;
+      commentArray.push(new Comment(commentList.comments.data[i]));
+    } 
     return commentArray;
   }
 }

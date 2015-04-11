@@ -1,129 +1,122 @@
 doctype html
 head
   title BUNDL
+  link(href='css/reset.css', rel='stylesheet', type='text/css')
   link(href='css/bundl_style.css', rel='stylesheet', type='text/css')
   link(href='css/main.css', rel='stylesheet', type='text/css')
-  body#home
-    #bundl_wrapper
-      #bundl_header
-        #bundl_menu
-          ul
-            li
-              a(href='/index')
-                span
-                | Home
-            |                 
-            li
-              a(href='/features')
-                span
-                | Features
-            |                 
-            li
-              a(href='/support')
-                span
-                | Support
-            |                 
-            li
-              a(href='/about')
-                span
-                | About
+body
+div
+  #home
+  #bundl_wrapper
+    #bundl_header
+      #bundl_menu
+        ul
+          li
+            a(href='/index')
+              span
+              | Home
+          |                 
+          li
+            a(href='/features')
+              span
+              | Features
+          |                 
+          li
+            a(href='/support')
+              span
+              | Support
+          |                 
+          li
+            a(href='/about')
+              span
+              | About
+      |  
+      |         
+      |         
+      #bundl_title
+        .title
+          h1 WELCOME TO BUNDL
+          .account_info
+            | WELCOME, #{name}  
+            br
+            | 
+            .logout
+              a(href='/logout') Logout! 
+      #bundl_main
+       #bundl_sidebar
+        #signin_area
+            .promo_box
+              form(action='/post')
+                input(type='submit', value='Make a post')
+            |             
+            |             
+            .review_box
+              include ./smButtons.jade
+                br
+                br
+                br
+                br
+        br
         |  
-        |         
-        |         
-        #bundl_title
-          .title
-            h1 WELCOME TO BUNDL
-            .account_info
-              | WELCOME, #{name}  
-              br
-              | 
-              .logout
-                a(href='/logout') Logout! 
-        // end of header
-        #bundl_main
-          #bundl_sidebar
-            #bundl_sidebar
-              .promo_box
-                form(action='/post')
-                  input(type='submit', value='Make a post')
-              |             
-              |             
-              .review_box
-                a(href='http://www.plus.google.com')
-                  img(src='images/google-plus.png', alt='Navigate to Google+')
-                br
-                a(href='http://www.facebook.com')
-                  img(src='images/facebook.png', alt='Navigate to Facebook')
-                br
-                a(href='http://www.twitter.com')
-                  img(src='images/twitter.png', alt='Navigate to Twitter')
-                br     
-                a(href='http://www.linkedin.com') 
-                  img(src='images/linkedin.png', alt='Navigate to LinkedIn')
-          |  
-          section.content
-            if (errorMessage)
-              p There was an error: #{errorMessage}
-            else
-              each post, pdex in index.test
-                div.holder
-                  div.post
+        section.content
+          if (errorMessage)
+            p There was an error: #{errorMessage}
+          else
+            each post, pdex in index.test
+              div.holder
+                div.post
+                  br
+                  p  POST #{pdex+1} 
+                  |  ID: #{post.postID}
+                  br
+                  |  AUTHOR: #{post.author}
+                  br
+                  |  MESSAGE: #{post.message}
+                  br
+                  |  TIME: #{post.createdTimeString}
+                  br
+                  | COMMENT COUNT: #{post.commentCount}
+                  br
+                  | SOCIAL MEDIA: #{post.socialMedia}
+                  br
+                  | LIKES: #{post.like_count}
+                  br
+                each comment, dex in post.comments
+                  div.comment
+                    p COMMENT #{dex+1}
+                    | ID: #{comment.postID}
                     br
-                    p  POST #{pdex+1} 
-                    |  ID: #{post.postID}
+                    | MESSAGE: #{comment.message}
                     br
-                    |  AUTHOR: #{post.author}
+                    | AUTHOR: #{comment.author}
                     br
-                    |  MESSAGE: #{post.message}
+                    | DATE: #{comment.timeString}
                     br
-                    |  TIME: #{post.createdTimeString}
+                    | Social Media: #{comment.socialMedia}
                     br
-                    | COMMENT COUNT: #{post.commentCount}
+                    | LIKES: #{comment.like_count}
                     br
-                    | SOCIAL MEDIA: #{post.socialMedia}
-                    br
-                    | LIKES: #{post.like_count}
-                    br
-                  each comment, dex in post.comments
-                    div.comment
-                      p COMMENT #{dex+1}
-                      | ID: #{comment.postID}
-                      br
-                      | MESSAGE: #{comment.message}
-                      br
-                      | AUTHOR: #{comment.author}
-                      br
-                      | DATE: #{comment.timeString}
-                      br
-                      | Social Media: #{comment.socialMedia}
-                      br
-                      | LIKES: #{comment.like_count}
-                      br
-                    if (comment.socialMedia == 2)
-                      div.messageBox
-                        form(method="post", action="/bin/processComment")
-                          input(type="text", value="#{comment.socialMedia}", name="smID" hidden)
-                          input(type="text", value="#{comment.postID}", name="id" hidden)
-
-                          textarea(type="text",name="commentMessage", value='@'+comment.author)
-                        div#submit
-                          input(type="submit", value="Submit")
-                     br
-                  if (post.socialMedia == 1)
+                  if (comment.socialMedia == 2)
                     div.messageBox
                       form(method="post", action="/bin/processComment")
-                        input(type="text", value="#{post.socialMedia}", name="smID" hidden)
-                        input(type="text", value="#{post.postID}", name="id" hidden)
-                        textarea(type="text",name="commentMessage", value='')
+                        input(type="text", value="#{comment.socialMedia}", name="smID" hidden)
+                        input(type="text", value="#{comment.postID}", name="id" hidden)
+
+                        textarea(type="text",name="commentMessage", value='@'+comment.author)
                       div#submit
                         input(type="submit", value="Submit")
-
-
-              
-      // end of content
-    // end of main
-    // end of wrapper
-    #bundl_footer_wrapper
-      #bundl_footer
-        | Copyright &copy; 2015 
-        a(href='#') BUNDL
+                   br
+                if (post.socialMedia == 1)
+                  div.messageBox
+                    form(method="post", action="/bin/processComment")
+                      input(type="text", value="#{post.socialMedia}", name="smID" hidden)
+                      input(type="text", value="#{post.postID}", name="id" hidden)
+                      textarea(type="text",name="commentMessage", value='')
+                    div#submit
+                       input(type="submit", value="Submit")
+         
+  footer
+   #bundl_footer_wrapper
+    #bundl_footer
+     | Copyright &copy; 2015 
+     a(href='/index') BUNDL
