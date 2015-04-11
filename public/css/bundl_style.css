@@ -1,6 +1,4 @@
 body {
-	margin: 0;
-	padding: 0;
 	color: #333;
 	font-family: Tahoma, Geneva, sans-serif;
 	font-size: 13px;
@@ -20,7 +18,7 @@ a, a:link, a:visited {
 }
 
 a:hover { 
-	text-decoration: none; 
+	text-color: orange; 
 }
 
 
@@ -29,9 +27,6 @@ p {
 	padding: 0; 
 }
 
-img { 
-	border: none; 
-}
 
 blockquote { 
 	font-style: italic; 
@@ -63,13 +58,6 @@ h4 { font-size: 18px; margin: 0 0 15px; padding: 0; }
 h5 { font-size: 16px; margin: 0 0 10px; padding: 0;  }
 h6 { font-size: 14px; margin: 0 0 5px; padding: 0; }
 
-.cleaner { clear: both }
-.h10 { height: 10px }
-.h20 { height: 20px }
-.h30 { height: 30px }
-.h40 { height: 40px }
-.h50 { height: 50px }
-.h60 { height: 60px }
 
 .float_l { float: left }
 .float_r { float: right }
@@ -95,7 +83,6 @@ h6 { font-size: 14px; margin: 0 0 5px; padding: 0; }
 
 
 #bundl_wrapper {
-	width: 980px;
 	margin: 0 auto;
 	padding: 0 5px;
 }
@@ -123,7 +110,7 @@ h6 { font-size: 14px; margin: 0 0 5px; padding: 0; }
 
 #bundl_menu ul {
 	margin: 0 auto;
-	padding: 0 0 0 250px;
+	padding: 0 0 0 450px;
 	list-style: none;
 }
 
@@ -200,6 +187,8 @@ h6 { font-size: 14px; margin: 0 0 5px; padding: 0; }
 #bundl_sidebar {
 	float: left;
 	width: 280px;
+	height: 700px;
+        text-align: center;
 }
 
 .sidebar_box {
@@ -230,7 +219,7 @@ h6 { font-size: 14px; margin: 0 0 5px; padding: 0; }
 .sidebar_nav li a { 
 	display: block; 
 	text-decoration: none; 
-	padding-bottom: 2px; 
+	padding-bottom: 2px;
 	margin-bottom: 8px; 
 }
 
@@ -240,7 +229,7 @@ h6 { font-size: 14px; margin: 0 0 5px; padding: 0; }
 }
 
 #signin_area{
-text-align: center; 
+  text-align: center; 
 }
 
 /* content */
@@ -286,22 +275,31 @@ text-align: center;
 
 #bundl_footer_wrapper {
 	clear: both;
-	width: 100%;
+	
 	border-top: 1px solid #898989;
 	background: #aeaeae;
+  bottom: 0px;
+  
 }
 
 #bundl_footer {
 	clear: both;
-	width: 980px;
 	height: 20px;
-	padding: 15px 5px;	
-	margin: 0 auto;
 	color: #666;
 	text-align: center;
+  bottom: 0px;
 }
 
 #bundl_footer a { 
 	color: #000; 
 	text-decoration: underline; 
+}
+
+#bundl_index{
+  float: left;
+  clear: both;
+  bottom: 0px;
+  left: 0px;
+  width: 100%;
+  
 }
