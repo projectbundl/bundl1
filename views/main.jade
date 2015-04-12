@@ -35,7 +35,7 @@ div
       |         
       #bundl_title
         .title
-          h1 WELCOME TO BUNDL
+          img(src='images/bundlLogo.png', alt='BUNDLe Logo')
           .account_info
             | WELCOME, #{name}  
             br
@@ -56,6 +56,7 @@ div
                 br
                 br
                 br
+<<<<<<< HEAD
       br
       |  
       section.content
@@ -67,6 +68,17 @@ div
               div.post
                 br
                 p  POST #{pdex+1} 
+=======
+       br
+       |  
+       section.content
+          if (errorMessage)
+            p There was an error: #{errorMessage}
+          else
+            each post, pdex in index.test
+              div.holder
+                div.post
+>>>>>>> d3c23666ecb8e548c23133b0a567d571442b1a60
                   br
                   |  ID: #{post.postID}
                   br
