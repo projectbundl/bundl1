@@ -10,17 +10,61 @@ body {
 
 }
 
-.holder {
+div.holder {
+  margin: 10px auto;
+  width: 70%;
   border: 1px solid blue;
-  margin: 5px;
+  border-radius: 25px;
+  overflow: hidden;
 }
 
-.post {
-  border: 1px dash;
-  margin: 3px;
+div.subHolder {
+  overflow: hidden;
+  border-bottom: 1px solid blue;
+  border-radius: 25px;
 }
-.content {
+
+div.Likes {
+  float: right;
+  width: 40%;
+  padding: 5px;;
+}
+
+div.SocialMedias {
+  width: 40%;
+  float: left;
+  padding: 8px;
+}
+
+div.messageBox {
+  float: bottom;
+  padding: 20px;
+}
+
+div.post {
+  padding: 14px;
+  text-align: left;
+  word-break: break-word;
+  background-color:white;
+  border-bottom: 1px solid blue;
+  border-radius: 25px;
+}
+
+div.comment {
+  word-break: break-word;
+  background-color: lightgray;
+  width: 70%;
+  margin: 5px;
+  float: right;
+  padding: 4px;
+}
+
+section.content {
   float:right;
   width:70%;
   text-align:center;
+}
+
+div.clear {
+  clear: both;
 }

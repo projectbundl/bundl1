@@ -67,20 +67,28 @@ div
               div.post
                 br
                 p  POST #{pdex+1} 
-                |  ID: #{post.postID}
-                br
-                |  AUTHOR: #{post.author}
-                br
-                |  MESSAGE: #{post.message}
-                br
-                |  TIME: #{post.createdTimeString}
-                br
-                | COMMENT COUNT: #{post.commentCount}
-                br
-                | SOCIAL MEDIA: #{post.socialMedia}
-                br
-                | LIKES: #{post.like_count}
-                br
+                  br
+                  |  ID: #{post.postID}
+                  br
+                  |  AUTHOR: #{post.author}
+                  br
+                  |  MESSAGE: #{post.message}
+                  br
+                  |  TIME: #{post.updatedTimeString}
+                  br
+                  | COMMENT COUNT: #{post.commentCount}
+              div.clear
+              div.subHolder
+                div.SocialMedias
+                  if (post.socialMedia == 1)
+                    img(src='images/facebook.png', alt='facebook', width='20px')
+                  if (post.socialMedia == 2)
+                    img(src='images/twitter.png', alt='twitter', width='20px')
+                  if (post.socialMedia == 3)
+                    img(src='images/google-plus.png', alt='google+', width='20px')
+                div.Likes
+                  | Likes: #{post.like_count}
+              div.clear
               each comment, dex in post.comments
                 div.comment
                   p COMMENT #{dex+1}
@@ -104,7 +112,7 @@ div
 
                       textarea(type="text",name="commentMessage", value='@'+comment.author)
                     div#submit
-                      input(type="submit", value="Submit")
+                      input(type="submit", value="Comment On Comment")
                  br
               if (post.socialMedia == 1)
                 div.messageBox
@@ -113,7 +121,7 @@ div
                     input(type="text", value="#{post.postID}", name="id" hidden)
                     textarea(type="text",name="commentMessage", value='')
                   div#submit
-                     input(type="submit", value="Submit")
+                     input(type="submit", value="Comment On Post")
        
   footer
    #bundl_footer_wrapper
