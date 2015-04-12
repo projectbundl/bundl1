@@ -3,3 +3,4 @@
 /csr.pem
 /key.pem
 /cert_files/*
+/public/uploads

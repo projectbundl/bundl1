@@ -63,7 +63,7 @@ div
       |   
       center
         div#errors 
-        form(method="post", action="/post")
+        form(method="post", action="/post", enctype="multipart/form-data")
           input(type='checkbox', name='sel', value='0')
           | Select All
           |       
@@ -79,10 +79,9 @@ div
           input(type='checkbox', name='sel', value='2')
           | Twitter
           br
-          |     
+          input(type="file", name="fileName")
           br
-          br
-          input(type='text', name='picture',value='https://babbage.hbg.psu.edu:6395/images/bloggr.png')
+          input(type='text', name='picture',value='', placeholder='Enter Link Here')
           textarea(name='postMessage', placeholder='Enter your message here...', cols='75', rows='10', autofocus=true, required)
           div#submit
             input(type='submit', value='Post!')

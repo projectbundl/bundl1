@@ -6,9 +6,9 @@ function Post(obj) {
   this.message = obj.message;
   this.commentCount = commentCountFunction(obj);
   this.postID = obj.id;
+  this.updatedTimeValue = Date.parse(obj.updated_time);
   this.createdTimeString = obj.created_time||obj.updated_time;
   this.updatedTimeString = obj.updated_time;
-  this.updatedTimeValue = Date.parse(obj.updated_time);
   this.socialMedia = obj.socialMedia;
   this.comments = createCommentList(obj, obj.socialMedia);
   this.like_count=obj.like_count ;

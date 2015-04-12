@@ -64,3 +64,11 @@ exports.FBcommentToPost = function (message, postID, token, callback) {
     callback(err, res);
   });
 };
+
+exports.FBGetCommentURL = function(commentID, token, callback) {
+  graph.setAccessToken(token);
+  graph.get('/' + commentID, function(err, res) {
+    console.log('err:', err);
+    console.log('res', res);
+  });
+};
