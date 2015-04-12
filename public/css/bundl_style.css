@@ -88,7 +88,7 @@ h6 { font-size: 14px; margin: 0 0 5px; padding: 0; }
 }
 
 #bundl_header {
-	width: 980px;
+      	width: 980px;
 	height: 815px;
 	
 }
@@ -148,31 +148,12 @@ h6 { font-size: 14px; margin: 0 0 5px; padding: 0; }
 	width: 5px; height: 40px;
 	
 }
+/* title */
 
-/* site title */
-
-#site_title { 
-	clear: both; 
-	padding-top: 30px; 
-	height: 74px; 
-}
-
-#site_title h1 { 
-	margin: 0; 
-	padding: 0; 
-}
-
-#site_title h1 a { 
-	display: block; 
-	width: 400px; 
-	height: 25px; 
-	padding-top: 45px; 
-	margin: 0 auto; 
-	color: #000; 
-	font-size: 16px; 
-	text-align: center; 
-	text-decoration: none; 
-	letter-spacing: 2px; 
+.title{
+	text-align: center;
+	padding-left: 300px;
+	padding-bottom: 20px;
 }
 
 /* main */
@@ -239,10 +220,6 @@ h6 { font-size: 14px; margin: 0 0 5px; padding: 0; }
 	width: 640px;
 }
 
-.title { 
-	margin-bottom: 25px; 
-	padding-bottom: 25px; 
-}
 
 .account_info{
 	float: right;

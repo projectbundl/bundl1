@@ -35,7 +35,7 @@ div
       |         
       #bundl_title
         .title
-          h1 WELCOME TO BUNDL
+          img(src='images/bundlLogo.png', alt='BUNDLe Logo')
           .account_info
             | WELCOME, #{name}  
             br
@@ -56,9 +56,9 @@ div
                 br
                 br
                 br
-        br
-        |  
-        section.content
+       br
+       |  
+       section.content
           if (errorMessage)
             p There was an error: #{errorMessage}
           else
