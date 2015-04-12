@@ -184,6 +184,9 @@ app.route('/post')
       var selection = req.body.sel;
       var asyncSubmitPosts = [];
       var errorMessage = '';
+      var twitterMessage;
+
+      console.log('message len', postMessage.length);
 
       if (selection.indexOf('0') > -1 || selection.indexOf('1') > -1) {
         if (passport._strategies.facebook._oauth2.hasOwnProperty('accessToken')) {
@@ -193,19 +196,30 @@ app.route('/post')
             asyncSubmitPosts.push(function(fbAsyncCallback) {
               fbFunctions.FBpostToFeedMessageAccessToken(postMessage, 'https://babbage.hbg.psu.edu:6395/uploads/' + req.files.fileName.name, passport._strategies.facebook._oauth2.accessToken, fbcallbackpix);
 
-
               function fbcallbackpix(err3, facebook3) {
-                fbAsyncCallback();
+                if (postMessage.length > 140) {
+                  fbFunctions.FBGetCommentURL(facebook3.id, passport._strategies.facebook._oauth2.accessToken, function fbCommentCallback(url) {
+                    fbAsyncCallback(url);
+                  });
+                } else {
+                  fbAsyncCallback();
+                }
               }
             });
           } else {
          
             asyncSubmitPosts.push(function(fbAsyncCallback) {
               fbFunctions.FBpostToFeedMessageAccessToken(postMessage, req.body.picture, passport._strategies.facebook._oauth2.accessToken, fbcallpix);
-              function fbcallpix(err2, facebook2){
-                fbAsyncCallback();
+
+              function fbcallpix(err2, facebook2) {
+                if (postMessage.length > 140) {
+                  fbFunctions.FBGetCommentURL(facebook2.id, passport._strategies.facebook._oauth2.accessToken, function fbCommentCallback(url) {
+                    fbAsyncCallback(url);
+                  });
+                } else {
+                  fbAsyncCallback();
+                }
               }
-               
             });
           }
           
@@ -217,27 +231,43 @@ app.route('/post')
       
       if (selection.indexOf('0') > -1 || selection.indexOf('2') > -1) {
         if (passport._strategies.twitter._oauth.hasOwnProperty('accessToken')) {
-          asyncSubmitPosts.push(function(twAsyncCallback) {
-            // Submit post to Twitter
-            twFunctions.TWtweet(postMessage, passport._strategies.twitter._oauth.accessToken, passport._strategies.twitter._oauth.tokenSecret, twcallback);
+          if (postMessage.length <= 140 || asyncSubmitPosts.length == 0) {
+            asyncSubmitPosts.push(function(twAsyncCallback) {
+              // Submit post to Twitter
+              twFunctions.TWtweet(postMessage, passport._strategies.twitter._oauth.accessToken, passport._strategies.twitter._oauth.tokenSecret, twcallback);
 
-            function twcallback(err, response) {
-              if (err) errorMessage += "Yo there was an error submitting your Twitter Post\n";
-              twAsyncCallback();
-            }
-          });
+              function twcallback(err, response) {
+                if (err) errorMessage += "Yo there was an error submitting your Twitter Post\n";
+                twAsyncCallback();
+              }
+            });
+          }
         } else {
           // unauthorized
           errorMessage += "Yo you do not have access to post to Twitter!\n";
         }
       }
 
-      async.parallel(asyncSubmitPosts, function() {
-        // Check if there were errors
-        if (errorMessage == '')
-        res.redirect('main');
-      else
-        res.redirect('main?error=' + errorMessage);
+      async.parallel(asyncSubmitPosts, function(url) {
+        if (postMessage.length > 140 && selection.length == 1) {
+          var shortmessage = twFunctions.TWtrunk(postMessage, url);
+          twFunctions.TWtweet(shortmessage, passport._strategies.twitter._oauth.accessToken, passport._strategies.twitter._oauth.tokenSecret, twcallback);
+
+          function twcallback(err, response) {
+            if (err) errorMessage += "Yo there was an error submitting your Twitter Post\n";
+            if (errorMessage == '')
+              res.redirect('main');
+            else
+              res.redirect('main?error=' + errorMessage);
+          }
+        } else {
+          console.log(url);
+          // Check if there were errors
+          if (errorMessage == '')
+            res.redirect('main');
+          else
+            res.redirect('main?error=' + errorMessage);
+        }
       });
     }
   });
