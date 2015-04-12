@@ -2,3 +2,4 @@
 /cert.pem
 /csr.pem
 /key.pem
+/cert_files/*

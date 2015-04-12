@@ -1,12 +1,52 @@
-html
-  head
-    link(rel='stylesheet', type='text/css', href='bundl_style./css/.css')
-  body
-    center
-      img(src='./images/bundlLogo.png', alt='BUNDLe Logo')
-    
-      p
-      |This is a page about us.
-      |Some text here. Some more text here. ETC... 
-      br
-   
+doctype html
+head
+  title BUNDL
+  link(href='css/reset.css', rel='stylesheet', type='text/css')
+  link(href='css/bundl_style.css', rel='stylesheet' type='text/css')
+body
+div
+  #home
+  #bundl_wrapper
+    #bundl_header
+      #bundl_menu
+        ul
+          li
+            a(href='/index')
+              span
+              | Home
+          |                 
+          li
+            a(href='/features')
+              span
+              | Features
+          |                 
+          li
+            a(href='/support')
+              span
+              | Support
+          li
+            a(href='/about')
+              span
+              | About
+      |  
+      |         
+      |                
+      #bundl_title
+       .title
+         img(src='images/bundlLogo7.png', alt='BUNDLe Logo')
+      #bundl_main
+       #bundl_sidebar
+        #signin_area
+        include ./smButtons.jade
+       section.content
+       center
+          p
+          |If you need help please contact bundlhelpdesk@gmail.com
+          br
+
+ #bundl_index 
+  footer
+   #bundl_footer_wrapper
+     #bundl_footer
+       | Copyright &copy; 2015     
+       a(href='/index') BUNDL
