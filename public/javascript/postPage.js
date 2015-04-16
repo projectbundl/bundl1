@@ -3,7 +3,6 @@ var timer;
   $("input[value='2']").click(function() {
     if($("input[value='2']"))
       {
-        alert("yep");
     timer=setInterval(function() {
       if ($('textarea[name="postMessage"]').val().length > 140) {
         $('#errors').show();
@@ -16,7 +15,6 @@ var timer;
  else{
   $('#errors').hide();
   clearInterval(timer);
-  alert("here");
  } 
 
   });

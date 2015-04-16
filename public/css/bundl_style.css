@@ -88,15 +88,7 @@ h6 { font-size: 14px; margin: 0 0 5px; padding: 0; }
 }
 
 #bundl_header {
-      	width: 980px;
 	height: 815px;
-	
-}
-
-#bundl_header_sp {
-	width: 980px;
-	height: 174px;
-	margin-bottom: 40px;
 	
 }
 
@@ -104,14 +96,13 @@ h6 { font-size: 14px; margin: 0 0 5px; padding: 0; }
 
 #bundl_menu {
 	clear: both;
-	width: 940px;
 	height: 40px;
 }
 
 #bundl_menu ul {
 	margin: 0 auto;
-	padding: 0 0 0 450px;
 	list-style: none;
+  text-align:center;
 }
 
 #bundl_menu ul li {
@@ -121,8 +112,6 @@ h6 { font-size: 14px; margin: 0 0 5px; padding: 0; }
 }
 
 #bundl_menu ul li a {
-	float: left;
-	display: block;
 	height: 35px;
 	line-height: 30px;
 	padding: 5px 20px 0 15px;
@@ -152,7 +141,6 @@ h6 { font-size: 14px; margin: 0 0 5px; padding: 0; }
 
 .title{
 	text-align: center;
-	padding-left: 300px;
 	padding-bottom: 20px;
 }
 
@@ -160,16 +148,14 @@ h6 { font-size: 14px; margin: 0 0 5px; padding: 0; }
 
 #bundl_main {
 	clear: both;
-	width: 980px;
 }
 
 /* sidebar */
 
 #bundl_sidebar {
 	float: left;
-	width: 280px;
-	height: 700px;
-        text-align: center;
+	width: 30%;
+  text-align: center;
 }
 
 .sidebar_box {
@@ -210,43 +196,28 @@ h6 { font-size: 14px; margin: 0 0 5px; padding: 0; }
 }
 
 #signin_area{
-  text-align: center; 
+  float:left;
+  width:50%;
 }
 
 /* content */
 
 #bundl_content {
-	float: right;
-	width: 640px;
+	float: left;
+	width: 60%;
 }
 
-
+.feat{
+  float: left;
+  width: 50%;
+}
 .account_info{
 	float: right;
-	padding-bottom: 25px;
 }
 
 .logout{
 	float: right; 
 }
-
-.col_fw_last { 
-	padding-bottom: 20px; 
-}
-
-.col_w200 { 
-	width: 200px; 
-}
-
-.col_w300 { 
-	width: 300px; 
-}
-
-.col_w400 { 
-	width: 400px; 
-}
-
- 
 
 /* footer */
 
@@ -278,5 +249,5 @@ h6 { font-size: 14px; margin: 0 0 5px; padding: 0; }
   bottom: 0px;
   left: 0px;
   width: 100%;
-  
+  position: absolute; 
 }

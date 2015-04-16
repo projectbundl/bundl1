@@ -51,20 +51,40 @@ div.post {
 }
 
 div.comment {
-  word-break: break-word;
+  display: none;
   background-color: lightgray;
-  width: 70%;
+  width: 100%;
   margin: 5px;
   float: right;
   padding: 4px;
 }
 
+div.commentIcon {
+  float: left;
+  padding: 10px;
+  margin-top: 3px;
+  margin-left: 10px;
+  border-right: 1px solid;
+  width: 20%;
+}
+
+div.commentText {
+  float: right;
+  width: 70%;
+  word-break: break-word;
+}
+
 section.content {
-  float:right;
-  width:70%;
+  float:left;
+  width:50%;
   text-align:center;
 }
 
 div.clear {
   clear: both;
+}
+
+div.content_right{
+  float: right;
+  width: 20%;
 }

@@ -4,6 +4,8 @@ head
   link(href='css/reset.css', rel='stylesheet', type='text/css')
   link(href='css/bundl_style.css', rel='stylesheet', type='text/css')
   link(href='css/main.css', rel='stylesheet', type='text/css')
+  script(type='application/javascript', src='https://ajax.googleapis.com/ajax/libs/jquery/1.11.2/jquery.min.js')
+  script(type='application/javascript', src='javascript/collapse.js')
 body
 div
   #home
@@ -36,92 +38,96 @@ div
       #bundl_title
         .title
           img(src='images/bundlLogo.png', alt='BUNDLe Logo')
-          .account_info
-            | WELCOME, #{name}  
-            br
-            | 
-            .logout
-              a(href='/logout') Logout! 
+             
+           
       #bundl_main
-       #bundl_sidebar
-        #signin_area
-            .promo_box
-              a(href ='./post')
-                img(src='./images/postButton.png', alt='Make a Post!')
-            |             
-            |            
-            .review_box
-              include ./smButtons.jade
+      .account_info
+       |WELCOME, #{name}  
+      br
+      .logout
+       a(href='/logout') Logout! <br> 
+      
+      #bundl_sidebar
+       #signin_area
+          .promo_box
+            a(href ='./post')
+              img(src='./images/postButton.png', alt='Make a Post!')
+          |             
+          |            
+          .review_box
+            include ./smButtons.jade
+              br
+              br
+              br
+              br
+      br
+      |  
+      section.content
+        if (errorMessage)
+          p There was an error: #{errorMessage}
+        else
+          each post, pdex in index.test
+            div.holder
+              div.post  
+                |  #{post.message}
                 br
+                |  #{post.author}
                 br
+                |  #{post.updatedTimeString}
                 br
-                br
-       br
-       |  
-       section.content
-          if (errorMessage)
-            p There was an error: #{errorMessage}
-          else
-            each post, pdex in index.test
-              div.holder
-                div.post
-                  p  POST #{pdex+1} 
-                  br
-                  |  ID: #{post.postID}
-                  br
-                  |  AUTHOR: #{post.author}
-                  br
-                  |  MESSAGE: #{post.message}
-                  br
-                  |  TIME: #{post.updatedTimeString}
-                  br
-                  | COMMENT COUNT: #{post.commentCount}
-                div.clear
-                div.subHolder
-                  div.SocialMedias
-                    if (post.socialMedia == 1)
-                      img(src='images/facebook.png', alt='facebook', width='20px')
-                    if (post.socialMedia == 2)
-                      img(src='images/twitter.png', alt='twitter', width='20px')
-                    if (post.socialMedia == 3)
-                      img(src='images/google-plus.png', alt='google+', width='20px')
-                  div.Likes
-                    | Likes: #{post.like_count}
-                div.clear
-                each comment, dex in post.comments
-                  div.comment
-                    p COMMENT #{dex+1}
-                    | ID: #{comment.postID}
+                |  #{post.commentCount}
+              div.clear
+              div.subHolder
+                div.SocialMedias
+                  each SMNumber in post.socialMedia
+                    if (SMNumber == 1)
+                       img(src='images/round/Facebook.png', alt='facebook', width='25px') 
+                    if (SMNumber == 2) 
+                       img(src='images/round/Twitter.png', alt='twitter', width='25px')
+                    if (SMNumber == 3)
+                       img(src='images/round/GooglePlus.png', alt='google+', width='25px')
+                div.Likes
+                  | Likes: #{post.like_count}
+              div.clear
+              each comment, dex in post.comments
+                div.comment
+                  div.commentIcon
+                    if comment.socialMedia == 1
+                      img(src='/images/facebook.png', alt='facebook', width='75px')
+                    if comment.socialMedia == 2
+                      img(src='/images/twitter.png', alt='facebook', width='75px')
+                    if comment.socialMedia == 3
+                      img(src='/images/google-plus.png', alt='facebook', width='75px')
+                  div.commentText    
+                    | #{comment.message}
                     br
-                    | MESSAGE: #{comment.message}
+                    | #{comment.author}
                     br
-                    | AUTHOR: #{comment.author}
+                    | #{comment.timeString}
                     br
-                    | DATE: #{comment.timeString}
-                    br
-                    | Social Media: #{comment.socialMedia}
+                    //| Social Media: #{comment.socialMedia}
                     br
                     | LIKES: #{comment.like_count}
                     br
-                  if (comment.socialMedia == 2)
-                    div.messageBox
-                      form(method="post", action="/bin/processComment")
-                        input(type="text", value="#{comment.socialMedia}", name="smID" hidden)
-                        input(type="text", value="#{comment.postID}", name="id" hidden)
-
-                        textarea(type="text",name="commentMessage", value='@'+comment.author)
-                      div#submit
-                        input(type="submit", value="Comment On Comment")
-                   br
-                if (post.socialMedia == 1)
+                if (comment.socialMedia == 2)
                   div.messageBox
                     form(method="post", action="/bin/processComment")
-                      input(type="text", value="#{post.socialMedia}", name="smID" hidden)
-                      input(type="text", value="#{post.postID}", name="id" hidden)
-                      textarea(type="text",name="commentMessage", value='')
+                      input(type="text", value="#{comment.socialMedia}", name="smID" hidden)
+                      input(type="text", value="#{comment.postID}", name="id" hidden)
+
+                      textarea(type="text",name="commentMessage", value='@'+comment.author)
+                      div#submit
+                      input(type="submit", value="Comment On Comment")
+                 br
+              if (post.socialMedia == 1)
+                div.messageBox
+                  form(method="post", action="/bin/processComment")
+                    input(type="text", value="#{post.socialMedia}", name="smID" hidden)
+                    input(type="text", value="#{post.postID}", name="id" hidden)
+                    textarea(type="text",name="commentMessage", value='')
                     div#submit
-                       input(type="submit", value="Comment On Post")
-         
+                     input(type="submit", value="Comment On Post")
+       div.content_right
   footer
    #bundl_footer_wrapper
     #bundl_footer

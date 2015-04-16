@@ -1,3 +1,4 @@
+var moment =require('moment');
 var Comment = require('./CLSComment.js');
 
 // Constructor
@@ -8,8 +9,8 @@ function Post(obj) {
   this.postID = obj.id;
   this.updatedTimeValue = Date.parse(obj.updated_time);
   this.createdTimeString = obj.created_time||obj.updated_time;
-  this.updatedTimeString = obj.updated_time;
-  this.socialMedia = obj.socialMedia;
+  this.updatedTimeString = moment(obj.updated_time).format("ddd MMM D, YYYY h:m A");
+  this.socialMedia = [obj.socialMedia];
   this.comments = createCommentList(obj, obj.socialMedia);
   this.like_count=obj.like_count ;
 }

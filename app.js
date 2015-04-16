@@ -38,23 +38,22 @@ var app = express();
 app.use(multer({dest:'./public/uploads'}));
 app.use(compression());
 app.use(morgan('dev'));
-app.use(bodyParser.urlencoded({extended:true}));
-app.use(bodyParser.json());
 app.use(express.static(__dirname + '/public'));
 app.use(express.static(__dirname + '/views'));
 app.set('view engine', 'jade');
 app.use(cookieParser());
 
-var sessionStore = session({secret:"ssh!!", cookie:{maxAge:3600000}, resave: true, saveUninitialized: true});
+var sessionStore = session({secret:"ssh!!", cookie:{maxAge:3600000}, resave: true, saveUninitialized: true, httpOnly: true, secure: true});
 app.use(sessionStore);
+app.use(bodyParser.urlencoded({extended:true}));
+app.use(bodyParser.json());
 
 app.use(passport.initialize());
 app.use(passport.session());
 
-/*
 // Log all server requests
 app.use(function(req, res, next) {
-  console.log('%s %s', req.method, req.url);
+/*  console.log('%s %s', req.method, req.url);
   var err = req.session.error, msg = req.session.notice, success = req.session.success;
 
   delete req.session.error;
@@ -64,10 +63,10 @@ app.use(function(req, res, next) {
   if (err) res.locals.error = err;
   if (msg) res.locals.notice = msg;
   if (success) res.locals.success = success;
-
+*/
+  //console.log(req.session);
   next();
 });
-*/
 
 // Passport session setup.
 //   To support persistent login sessions, Passport needs to be able to
@@ -93,18 +92,17 @@ passport.use('twitter', new TwitterStrategy({
   consumerKey: TWITTER_CONSUMER_KEY,
   consumerSecret: TWITTER_CONSUMER_SECRET,
   callbackURL: "https://babbage.hbg.psu.edu:6395/auth/twitter/callback",
-  oauth_authenticate_url: 'https://api.twitter.com/oauth/authenticate'
-  },
-  function(accessToken, tokenSecret, profile, done) {
+  oauth_authenticate_url: 'https://api.twitter.com/oauth/authenticate',
+  passReqToCallback: true },
+  function(req, accessToken, tokenSecret, profile, done) {
+    // asynchronous verification, for effect...
     process.nextTick(function() {
-      //User.findOrCreate(..., function(err, user) {
-      //if (err) { return done(err); }
       
-      passport._strategies.twitter._oauth.name = profile.displayName;
-      passport._strategies.twitter._oauth.accessToken = accessToken;
-      passport._strategies.twitter._oauth.tokenSecret = tokenSecret;
+      req.session.twitter = {_oauth2:{name:profile.displayName}};
+      req.session.twitter._oauth2.accessToken = accessToken;
+      req.session.twitter._oauth2.tokenSecret = tokenSecret;
+      
       return done(null, profile);
-    //});
     });
   }
 ));
@@ -115,13 +113,15 @@ passport.use('google', new GoogleStrategy({
   callbackURL: 'https://babbage.hbg.psu.edu:6395/auth/google/callback',
   scope: ['profile', 'email', 'openid', 'https://www.googleapis.com/auth/plus.stream.read', 'https://www.googleapis.com/auth/plus.me'],
   accessType: 'offline',
-  approvalPrompt: 'force'
-  }, 
-  function(accessToken, refreshToken, profile, done) {
+  approvalPrompt: 'force',
+  passReqToCallback: true }, 
+  function(req, accessToken, refreshToken, profile, done) {
+    // asynchronous verification, for effect...
     process.nextTick(function() {
-      passport._strategies.google._oauth2.accessToken = accessToken;
-      passport._strategies.google._oauth2.refreshToken = refreshToken;
-      passport._strategies.google._oauth2.name = profile.displayName;
+
+      req.session.google = {_oauth2: {'accessToken': accessToken}};
+      req.session.google._oauth2.refreshToken = refreshToken;
+      req.session.google._oauth2.name = profile.displayName;
 
       return done(null, profile);
     });
@@ -133,36 +133,31 @@ passport.use('facebook', new FacebookStrategy({
   clientID: FACEBOOK_APP_ID,
   clientSecret: FACEBOOK_APP_SECRET,
   callbackURL: "https://babbage.hbg.psu.edu:6395/auth/facebook/callback",
-  scope: ['user_events', 'publish_pages', 'manage_pages', 'user_photos', 'publish_stream','read_stream', 'publish_actions', 'public_profile'] },
-  function(accessToken, refreshToken, profile, done) {
+  scope: ['user_events', 'publish_pages', 'manage_pages', 'user_photos', 'publish_stream','read_stream', 'publish_actions', 'public_profile'],
+  passReqToCallback: true},
+  function(req, accessToken, refreshToken, profile, done) {
     // asynchronous verification, for effect...
     process.nextTick(function () {
-      // To keep the example simple, the user's Facebook profile is returned to
-      // represent the logged-in user.  In a typical application, you would want
-      // to associate the Facebook account with a user record in your database,
-      // and return that user instead.
         
-      // Can create our own cookie after user validation/ combine social media info from db
-      // http://zipplease.tumblr.com/post/34169331215/node-js-session-management-with-express
-      passport._strategies.facebook._oauth2.name = profile.displayName;
-      passport._strategies.facebook._oauth2.accessToken = accessToken;
-      passport._strategies.facebook._oauth2.profileID = profile.id;
+      req.session.facebook = {_oauth2: {'accessToken': accessToken}};
+      req.session.facebook._oauth2.name = profile.displayName;
+      req.session.facebook._oauth2.profileID = profile.id;
       return done(null, profile);
     });
   }
 ));
 
-app.post('/bin/processComment', function(req, res) {
+app.post('/bin/processComment', ensureAuthenticated, function(req, res) {
   // Ensure there is an access token for the SM that is having the social media post sent to
   if (req.body.commentMessage) {
     if (req.body.smID == '1') {
-      fbFunctions.FBcommentToPost(req.body.commentMessage, req.body.id, passport._strategies.facebook._oauth2.accessToken, fbCommentCallback);
+      fbFunctions.FBcommentToPost(req.body.commentMessage, req.body.id, req.session.facebook._oauth2.accessToken, fbCommentCallback);
 
       function fbCommentCallback(response) {
         res.redirect('../main');
       }
     } else if (req.body.smID == '2') {
-      twFunctions.TWcomment(req.body.commentMessage, req.body.id, passport._strategies.twitter._oauth.accessToken, passport._strategies.twitter._oauth.tokenSecret, twCommentCallback);
+      twFunctions.TWcomment(req.body.commentMessage, req.body.id, req.session.twitter._oauth2.accessToken, req.session.twitter._oauth2.tokenSecret, twCommentCallback);
 
       function twCommentCallback(response) {
         res.redirect('../main');
@@ -174,10 +169,10 @@ app.post('/bin/processComment', function(req, res) {
 });
 
 app.route('/post')
-  .get(function(req, res) {
+  .get(ensureAuthenticated, function(req, res) {
     res.render('post');
   })
-  .post(function(req, res) {
+  .post(ensureAuthenticated, function(req, res) {
     if (req.body.postMessage) {
       // Ensure there is an access token for the SM that is having the social media post sent to
       var postMessage = req.body.postMessage;
@@ -186,20 +181,18 @@ app.route('/post')
       var errorMessage = '';
       var twitterMessage;
 
-      console.log('message len', postMessage.length);
-
       if (selection.indexOf('0') > -1 || selection.indexOf('1') > -1) {
-        if (passport._strategies.facebook._oauth2.hasOwnProperty('accessToken')) {
+        if (req.session.facebook !== undefined) {
 
           // Submit post
           if (Object.getOwnPropertyNames(req.files).length !== 0) {
             asyncSubmitPosts.push(function(fbAsyncCallback) {
-              fbFunctions.FBpostToFeedMessageAccessToken(postMessage, 'https://babbage.hbg.psu.edu:6395/uploads/' + req.files.fileName.name, passport._strategies.facebook._oauth2.accessToken, fbcallbackpix);
+              fbFunctions.FBpostToFeedMessageAccessToken(postMessage, 'http://babbage.hbg.psu.edu:6396/uploads/' + req.files.fileName.name, req.session.facebook._oauth2.accessToken, fbcallbackpix);
 
               function fbcallbackpix(err3, facebook3) {
                 if (postMessage.length > 140) {
-                  fbFunctions.FBGetCommentURL(facebook3.id, passport._strategies.facebook._oauth2.accessToken, function fbCommentCallback(url) {
-                    fbAsyncCallback(url);
+                  fbFunctions.FBGetCommentURL(facebook3.id, req.session.facebook._oauth2.accessToken, function fbCommentCallback(err, res) {
+                    fbAsyncCallback(res);
                   });
                 } else {
                   fbAsyncCallback();
@@ -209,12 +202,13 @@ app.route('/post')
           } else {
          
             asyncSubmitPosts.push(function(fbAsyncCallback) {
-              fbFunctions.FBpostToFeedMessageAccessToken(postMessage, req.body.picture, passport._strategies.facebook._oauth2.accessToken, fbcallpix);
+              fbFunctions.FBpostToFeedMessageAccessToken(postMessage, req.body.picture, req.session.facebook._oauth2.accessToken, fbcallpix);
 
               function fbcallpix(err2, facebook2) {
                 if (postMessage.length > 140) {
-                  fbFunctions.FBGetCommentURL(facebook2.id, passport._strategies.facebook._oauth2.accessToken, function fbCommentCallback(url) {
-                    fbAsyncCallback(url);
+
+                  fbFunctions.FBGetCommentURL(facebook2.id, req.session.facebook._oauth2.accessToken, function fbCommentCallback(err, res) {
+                    fbAsyncCallback(res);
                   });
                 } else {
                   fbAsyncCallback();
@@ -230,11 +224,11 @@ app.route('/post')
       }
       
       if (selection.indexOf('0') > -1 || selection.indexOf('2') > -1) {
-        if (passport._strategies.twitter._oauth.hasOwnProperty('accessToken')) {
+        if (req.session.twitter !== undefined) {
           if (postMessage.length <= 140 || asyncSubmitPosts.length == 0) {
             asyncSubmitPosts.push(function(twAsyncCallback) {
               // Submit post to Twitter
-              twFunctions.TWtweet(postMessage, passport._strategies.twitter._oauth.accessToken, passport._strategies.twitter._oauth.tokenSecret, twcallback);
+              twFunctions.TWtweet(postMessage, req.session.twitter._oauth2.accessToken, req.session.twitter._oauth2.tokenSecret, twcallback);
 
               function twcallback(err, response) {
                 if (err) errorMessage += "Yo there was an error submitting your Twitter Post\n";
@@ -249,17 +243,20 @@ app.route('/post')
       }
 
       async.parallel(asyncSubmitPosts, function(url) {
-        if (postMessage.length > 140 && selection.length == 1) {
-          var shortmessage = twFunctions.TWtrunk(postMessage, url);
-          twFunctions.TWtweet(shortmessage, passport._strategies.twitter._oauth.accessToken, passport._strategies.twitter._oauth.tokenSecret, twcallback);
+        //console.log(url.actions[0].link);
+        if (postMessage.length > 140 && selection.length > 1) {
+          //console.log("in parallel:", url);
+          twFunctions.TWtrunk(postMessage, url.actions[0].link, function hollerback(totalMessage) {
+            twFunctions.TWtweet(totalMessage, req.session.twitter._oauth2.accessToken, req.session.twitter._oauth2.tokenSecret, twcallback);
 
-          function twcallback(err, response) {
-            if (err) errorMessage += "Yo there was an error submitting your Twitter Post\n";
-            if (errorMessage == '')
-              res.redirect('main');
-            else
-              res.redirect('main?error=' + errorMessage);
-          }
+            function twcallback(err, response) {
+              if (err) errorMessage += "Yo there was an error submitting your Twitter Post\n";
+              if (errorMessage == '')
+                res.redirect('main');
+              else
+                res.redirect('main?error=' + errorMessage);
+            }
+          });
         } else {
           console.log(url);
           // Check if there were errors
@@ -276,63 +273,68 @@ app.use('/error', function(req, res) {
   res.render('error');
 });
 
-app.use('/main', function(req, res) {
+app.use('/main', ensureAuthenticated, function(req, res) {
   var facebookResults;
   var twitterResults;
   var googleResults;
   var userName;
   var asyncTasks = [];
 
-  if (passport._strategies.facebook._oauth2.hasOwnProperty('accessToken')) {
+  if (req.session.facebook !== undefined) {
     // Push, pull FB post to async tasks
     asyncTasks.push(function(fbasynccallback) {
-      fbFunctions.FBpullAllPosts(passport._strategies.facebook._oauth2.accessToken, passport._strategies.facebook._oauth2.profileID, fbcallback)
+      fbFunctions.FBpullAllPosts(req.session.facebook._oauth2.accessToken, req.session.facebook._oauth2.profileID, fbcallback)
        
       function fbcallback(err, facebook){
         facebookResults = fbParser(facebook);
-        userName = passport._strategies.facebook._oauth2.name;
+        userName = req.session.facebook._oauth2.name;
         fbasynccallback();
       } 
     });
   }
 
-  if (passport._strategies.twitter._oauth.hasOwnProperty('accessToken')) {
+  if (req.session.twitter !== undefined) {
     // Push, pull TW post to async tasks
     asyncTasks.push(function(twasynccallback) {
-      twFunctions.TWpullAllTweets(passport._strategies.twitter._oauth.accessToken, passport._strategies.twitter._oauth.tokenSecret, twcallback);
+
+      twFunctions.TWpullAllTweets(req.session.twitter._oauth2.accessToken, req.session.twitter._oauth2.tokenSecret, twcallback);
 
       function twcallback(err, twitter) {
         twitterResults = twParser(twitter);
-        userName = passport._strategies.twitter._oauth.name;
+        userName = req.session.twitter._oauth2.name;
         twasynccallback();
       }
     });
   }
 
-  if (passport._strategies.google._oauth2.hasOwnProperty('accessToken')) {
+  if (req.session.google !== undefined) {
     asyncTasks.push(function(gpasynccallback) {
-      gpFunctions.GPpullAllPosts(passport._strategies.google._oauth2._clientId, passport._strategies.google._oauth2._clientSecret, passport._strategies.google._oauth2.accessToken, gpcallback);
+      gpFunctions.GPpullAllPosts(req.session.google._oauth2._clientId, req.session.google._oauth2._clientSecret, req.session.google._oauth2.accessToken, gpcallback);
 
       function gpcallback(err, google) {
-        gpParser(google, passport._strategies.google._oauth2._clientId, passport._strategies.google._oauth2._clientSecret, passport._strategies.google._oauth2.accessToken, function(results) {
+        gpParser(google, req.session.google._oauth2._clientId, req.session.google._oauth2._clientSecret, req.session.google._oauth2.accessToken, function(results) {
           googleResults = results;       
-          userName = passport._strategies.google._oauth2.name;
+          userName = req.session.google._oauth2.name;
           gpasynccallback();
         });
       }
     });
   }
 
-  async.parallel(asyncTasks, function() {
-    // combine posts here!!
-    var output = combineLists.combineLists(twitterResults, facebookResults, googleResults);
+  if (asyncTasks.length) {
+    async.parallel(asyncTasks, function() {
+      // combine posts here!!
+      var output = combineLists.combineLists(twitterResults, facebookResults, googleResults);
 
-    if (req.query['error'] !== 'undefined') {
-      res.render('main', {'errorMessage':req.query['error'], index:{test: output}, 'name':userName});
-    } else {
-      res.render('main', {'errorMessage':'', index:{test: output}, 'name':userName});
-    }
-  });
+      if (req.query['error'] !== 'undefined') {
+        res.render('main', {'errorMessage':req.query['error'], index:{test: output}, 'name':userName});
+      } else {
+        res.render('main', {'errorMessage':'', index:{test: output}, 'name':userName});
+      }
+    });
+  } else {
+    res.render('index');
+  }
 });
 
 
@@ -383,17 +385,12 @@ app.get('/auth/google/callback',
 
 
 app.get('/logout', function(req, res){
+  delete(req.session.twitter);
+  delete(req.session.google);
+  delete(req.session.facebook);
   req.session.destroy();
   req.logOut();
   res.redirect('/');
-  //req.session.save();
-  //req.session = null;
-  //res.redirect('index');
-  //req.session.destroy(function(err) {
-  //  res.redirect('index');
-  //});
-  //req.logout();
-  //res.render('index');
 });
 
 
@@ -415,5 +412,16 @@ app.use('/', function(req, res) {
 //   login page.
 function ensureAuthenticated(req, res, next) {
   if (req.isAuthenticated()) { return next(); }
-  res.redirect('index')
+  res.redirect('error')
 }
+
+var tempsession = function(req, res) {
+  console.log("I'm in the session");
+  var temp = req.session.passprot;
+  req.session.regenerate(function(err) {
+    req.session.passport = temp;
+    req.session.save(function(err) {
+      res.send(200);
+    });
+  });
+};

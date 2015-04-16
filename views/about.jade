@@ -3,6 +3,7 @@ head
   title BUNDL
   link(href='css/reset.css', rel='stylesheet', type='text/css')
   link(href='css/bundl_style.css', rel='stylesheet' type='text/css')
+  link(href='css/main.css', rel='stylesheet', type='text/css')
 body
 div
   #home
@@ -10,6 +11,7 @@ div
     #bundl_header
       #bundl_menu
         ul
+         centerl
           li
             a(href='/index')
               span
@@ -28,9 +30,6 @@ div
             a(href='/about')
               span
               | About
-      |  
-      |         
-      |         
       #bundl_title
         .title
           img(src='images/bundlLogo8.png', alt='BUNDLe Logo')
@@ -39,24 +38,24 @@ div
          #signin_area
          include ./smButtons.jade
        section.content
-       center
-          p
-          |Our Mission:
-          |Dealing with a multitude of social media websites can be a lot to juggle, so we decided
-          |it would be easier to simply integrate them all into a single place where they can all
-          |be managed with ease!
-          br
-          |The Team:
-          br
-          |Craig "Legs" Messinger
-          br
-          |Jesse "Tag Pro" Miller
-          br
-          |Solomon "Scrum Master" Shockley
-          br
-          |Yan "Do you even test bro" Zavatsky
-          br
-
+        center
+         p
+         |Our Mission:
+         |Dealing with a multitude of social media websites can be a lot to juggle, so we decided
+         |it would be easier to simply integrate them all into a single place where they can all
+         |be managed with ease!
+         br
+         |The Team:
+         br
+         |Craig Messinger
+         br
+         |Jesse Miller
+         br
+         |Solomon Shockley
+         br
+         |Yan Zavatsky
+         br
+       div.content_right
    #bundl_index
     footer
      #bundl_footer_wrapper

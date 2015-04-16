@@ -55,11 +55,14 @@ exports.TWComment = function(message, tweetID, accessKey, accessSecret, callback
   });
 }
 
-exports.TWtrunk = function(message, url){
-  var shortURL= Tiny.shorten(url, function(err, TheURL){console.log(TheURL)});
-  var truncateLength =140-(shortURL.length+4);
+exports.TWtrunk = function(message, url, hollerback){
+  Tiny.shorten(url, function(err, TheURL){
+  var truncateLength =140-(TheURL.length+4);
+  
+
   message = message.substring(0,truncateLength);
-  mesage+="... ";
-  message+=shortURL;
-return message;
+  message+="... ";
+  message+=TheURL;
+  hollerback(message);
+  });
 }
