@@ -14,7 +14,7 @@ div
           li
             a(href='/index')
               span
-              | Home
+              | Link Accounts 
           |                 
           li
             a(href='/features')
@@ -37,8 +37,10 @@ div
          img(src='images/bundlLogo7.png', alt='BUNDLe Logo')
       #bundl_main
        #bundl_sidebar
-        #signin_area
-        include ./smButtons.jade
+         #signin_area
+         include ./feedButton.jade
+         br 
+         include ./smButtons.jade
        section.content
         center
         p

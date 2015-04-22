@@ -29,18 +29,11 @@ function combineList(list1, list2) {
 
   while (currentl1Position < l1Count && currentl2Position < l2Count) {
     if (list1[currentl1Position].message == list2[currentl2Position].message) {
-     // var temp = list1[currentl1Position];
-      //combine the comments and the social media
-
-      //temp.message = "There was a combined SM " + list1[currentl1Position].message;
       
-      list1[currentl1Position].comments= list1[currentl1Position].comments.concat(list2[currentl2Position].comments);
-        //createCommentList(list2[currentl2Position], list2.socialMedia);
-      list1[currentl1Position].commentCount+=list2[currentl2Position].commentCount;
+      list1[currentl1Position].comments = list1[currentl1Position].comments.concat(list2[currentl2Position].comments);
+      list1[currentl1Position].commentCount += list2[currentl2Position].commentCount;
       list1[currentl1Position].socialMedia = list1[currentl1Position].socialMedia.concat(list2[currentl2Position].socialMedia);
       
-      
-
       output.push(list1[currentl1Position]);
       currentl1Position++;
       currentl2Position++;

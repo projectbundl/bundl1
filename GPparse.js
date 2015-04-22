@@ -30,6 +30,10 @@ module.exports = function(input, clientID, clientSecret, accessToken, retCallbac
       messageArray[index] = new Post(temp);
     }
   }
+  if (ctr == input.length) {
+    console.log('input', input.length);
+    retCallback(messageArray);
+  } 
 };
 
 function name (input, index, commentList){

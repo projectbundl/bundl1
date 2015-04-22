@@ -5,7 +5,19 @@ body {
 	background-color: #ececec;
 	background-repeat: repeat-x;
 	background-position: top;
-	
+  margin-bottom: -20px;
+}
+
+footer.temp {
+  clear: both;
+  position: relative;
+  bottom: 0;
+  height: auto !important;
+  height: 100%;
+}
+
+div.temp {
+  overflow: hidden;
 }
 
 #subpage { 
@@ -197,7 +209,9 @@ h6 { font-size: 14px; margin: 0 0 5px; padding: 0; }
 
 #signin_area{
   float:left;
-  width:50%;
+  text-align: center;
+  width:100%;
+  /*width:50%;*/
 }
 
 /* content */
@@ -213,17 +227,18 @@ h6 { font-size: 14px; margin: 0 0 5px; padding: 0; }
 }
 .account_info{
 	float: right;
+  padding-right:50px;
 }
 
 .logout{
 	float: right; 
-}
+  padding-right:50px;
+  }
 
 /* footer */
 
 #bundl_footer_wrapper {
 	clear: both;
-	
 	border-top: 1px solid #898989;
 	background: #aeaeae;
   bottom: 0px;
@@ -236,6 +251,9 @@ h6 { font-size: 14px; margin: 0 0 5px; padding: 0; }
 	color: #666;
 	text-align: center;
   bottom: 0px;
+}
+footer#bundl_footer {
+  color: #666;
 }
 
 #bundl_footer a { 
@@ -250,4 +268,12 @@ h6 { font-size: 14px; margin: 0 0 5px; padding: 0; }
   left: 0px;
   width: 100%;
   position: absolute; 
+}
+
+section.content {
+  width:50%;
+}
+
+div.clear {
+  clear:both;
 }

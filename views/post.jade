@@ -3,11 +3,11 @@ head
   title BUNDL
   link(href='css/reset.css', rel='stylesheet', type='text/css')
   link(href='css/bundl_style.css', rel='stylesheet', type='text/css')
-  link(href='css/post.css', rel='stylesheet', type='text/css')
+  link(href='css/main.css', rel='stylesheet', type='text/css')
   script(type='application/javascript', src='https://ajax.googleapis.com/ajax/libs/jquery/1.11.2/jquery.min.js')
   script(type='application/javascript', src='javascript/postPage.js')
 body
-div
+div.temp
   #home
   #bundl_wrapper
     #bundl_header
@@ -16,7 +16,7 @@ div
           li
             a(href='/index')
               span
-              | Home
+              | Link Accounts
           |                 
           li
             a(href='/features')
@@ -37,33 +37,25 @@ div
       |         
       #bundl_title
         .title
-         h1 WELCOME TO BUNDL
-         .account_info
-           | WELCOME, #{name}  
+         include random.html 
+       
+       
+       #bundl_main
+       .account_info
+        |WELCOME, #{name}  
+       br
+       .logout
+        a(href='/logout') Logout! <br>
+
+       #bundl_sidebar
+         #signin_area
+           include ./feedButton.jade  
            br
-           | 
-           .logout
-             a(href='/logout') Logout!
-      #bundl_main
-        #bundl_sidebar
-          #bundl_sidebar
-           #signin_area
-            .promo_box
-              a(href='./main')
-                img(src='./images/feedButton.png', alt='Navigate to Feed')
-            |             
-            |             
-            .review_box
-              include ./smButtons.jade
-              br
-              br
-              br
-              br
-      br
-      |   
-      center
-        div#errors 
-        form(method="post", action="/post", enctype="multipart/form-data")
+           include ./smButtons.jade
+       br
+       section.content
+         div#errors 
+         form(method="post", action="/post", enctype="multipart/form-data")
           input(type='checkbox', name='sel', value='0')
           | Select All
           |       
@@ -73,22 +65,24 @@ div
           input(type='checkbox', name='sel', value='3', class='readonly', disabled='disabled')
           | Google+
           |       
-          input(type='checkbox', name='sel', value='4', class='readonly', disabled='disabled')
-          | Blogger
-          |       
           input(type='checkbox', name='sel', value='2')
           | Twitter
+          | 
+          br
+          div.clear
           br
           input(type="file", name="fileName")
+          div.clear
           br
-          input(type='text', name='picture',value='', placeholder='Enter Link Here')
           textarea(name='postMessage', placeholder='Enter your message here...', cols='75', rows='10', autofocus=true, required)
+          div.clear
+          br
           div#submit
             input(type='submit', value='Post!')
-
- #bundl_index
-   footer
-    #bundl_footer_wrapper
-      #bundl_footer
-        | Copyright &copy; 2015 
-        a(href='/index') BUNDL
+       div.content_right   
+footer.temp
+#bundl_index
+ #bundl_footer_wrapper
+   #bundl_footer
+     | Copyright &copy; 2015 
+     a(href='/index') BUNDL

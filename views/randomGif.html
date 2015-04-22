@@ -1,0 +1,19 @@
+<script type="text/javascript">
+  var imlocation = "images/";
+  var currentdate = 0;
+  var image_number = 0;
+  function ImageArray (n) {
+    this.length = n;
+    for (var i =0; i < n; i++) {
+      this[i] = ' '
+    }
+  }
+image = new ImageArray(2)
+image[0] = 'temp.gif'
+image[1] = 'temp2.gif'
+function randomimage() {
+  image_number = Math.floor(Math.random() * 2);
+  return(image[image_number])
+}
+document.write("<img src='" + imlocation + randomimage()+ "' height=500>");
+</script>

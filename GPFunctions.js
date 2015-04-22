@@ -1,13 +1,14 @@
 var google = require('googleapis');
 
 exports.GPpullAllPosts = function(clientID, clientSecret, accessToken, callback) {
+
   var plus = google.plus('v1');
   var oauth2Client = new google.auth.OAuth2(clientID, clientSecret);
 
   oauth2Client.setCredentials({'access_token': accessToken});
 
-  plus.activities.list({'userId': 'me', 'collection': 'public', 'auth':oauth2Client}, function(err, res) {
-    //console.log(JSON.stringify(res));
+  plus.activities.list({'userId': 'me', 'maxResults': 50, 'collection': 'public', 'auth':oauth2Client}, function(err, res) {
+
     callback(err, res.items);
   });
 };

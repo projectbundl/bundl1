@@ -4,7 +4,11 @@ var Comment = require('./CLSComment.js');
 // Constructor
 function Post(obj) {
   this.author = obj.from.name;
-  this.message = obj.message;
+  if (obj.socialMedia == 3) {
+    this.message = escapeMessage(obj.message);
+  } else {
+    this.message = obj.message;
+  }
   this.commentCount = commentCountFunction(obj);
   this.postID = obj.id;
   this.updatedTimeValue = Date.parse(obj.updated_time);
@@ -34,6 +38,11 @@ function createCommentList(commentList, socialMedia){
     } 
     return commentArray;
   }
+}
+
+function escapeMessage(mess) {
+  var tempRet = mess.replace(/&quot;/g, "\"");
+  return tempRet.replace(/&#39;/g, "\'").substring(0, tempRet.length - 1);
 }
 
 module.exports = Post;

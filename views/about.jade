@@ -11,11 +11,11 @@ div
     #bundl_header
       #bundl_menu
         ul
-         centerl
+         center
           li
             a(href='/index')
               span
-              | Home
+              | Link Accounts
           |                 
           li
             a(href='/features')
@@ -36,6 +36,8 @@ div
       #bundl_main
        #bundl_sidebar
          #signin_area
+         include ./feedButton.jade  
+         br
          include ./smButtons.jade
        section.content
         center

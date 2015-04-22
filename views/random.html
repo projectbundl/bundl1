@@ -1,0 +1,23 @@
+<script type="text/javascript">
+<!--
+ var imlocation = "images/";
+  var currentdate = 0;
+   var image_number = 0;
+    function ImageArray (n) {
+         this.length = n;
+            for (var i =1; i <= n; i++) {
+                   this[i] = ' '
+                        }
+             }
+ image = new ImageArray(4)
+     image[0] = 'bundlLogo5.png'
+     image[1] = 'bundlLogo6.png'
+     image[2] = 'bundlLogo7.png'
+     image[3] = 'bundlLogo8.png'
+       function randomimage() {
+         image_number = Math.floor(Math.random() * 4);
+         return(image[image_number])
+                     }
+ document.write("<img src='" + imlocation + randomimage()+ "'>");
+ //-->
+</script>

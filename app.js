@@ -170,7 +170,15 @@ app.post('/bin/processComment', ensureAuthenticated, function(req, res) {
 
 app.route('/post')
   .get(ensureAuthenticated, function(req, res) {
-    res.render('post');
+    if(req.session.twitter !== undefined)
+      userName = req.session.twitter._oauth2.name; 
+    else if(req.session.facebook !== undefined)
+      userName = req.session.facebook._oauth2.name;
+    else if(req.session.google !== undefined)
+      userName = req.session.google._oauth2.name;
+    else
+      userName = "";
+    res.render('post', {name: userName});
   })
   .post(ensureAuthenticated, function(req, res) {
     if (req.body.postMessage) {
@@ -226,15 +234,27 @@ app.route('/post')
       if (selection.indexOf('0') > -1 || selection.indexOf('2') > -1) {
         if (req.session.twitter !== undefined) {
           if (postMessage.length <= 140 || asyncSubmitPosts.length == 0) {
-            asyncSubmitPosts.push(function(twAsyncCallback) {
-              // Submit post to Twitter
-              twFunctions.TWtweet(postMessage, req.session.twitter._oauth2.accessToken, req.session.twitter._oauth2.tokenSecret, twcallback);
+            if (Object.getOwnPropertyNames(req.files).length !== 0) {
+              asyncSubmitPosts.push(function(twAsyncCallback) {
+                twFunctions.twitter_image(postMessage, req.files, req.session.twitter._oauth2.accessToken, req.session.twitter._oauth2.tokenSecret, twcallback);
+                function twcallback(err, response) {
+                  if (err) errorMessage += "Yo there was an error uploading your image to Twitter\n";
+                  //console.log('twi err:', err);
+                  //console.log('twi res', response);
+                  twAsyncCallback();
+                }
+              });
+            } else {
+              asyncSubmitPosts.push(function(twAsyncCallback) {
+                // Submit post to Twitter
+                twFunctions.TWtweet(postMessage, req.session.twitter._oauth2.accessToken, req.session.twitter._oauth2.tokenSecret, twcallback);
 
-              function twcallback(err, response) {
-                if (err) errorMessage += "Yo there was an error submitting your Twitter Post\n";
-                twAsyncCallback();
-              }
-            });
+                function twcallback(err, response) {
+                  if (err) errorMessage += "Yo there was an error submitting your Twitter Post\n";
+                  twAsyncCallback();
+                }
+              });
+            }
           }
         } else {
           // unauthorized
@@ -258,7 +278,6 @@ app.route('/post')
             }
           });
         } else {
-          console.log(url);
           // Check if there were errors
           if (errorMessage == '')
             res.redirect('main');
@@ -274,6 +293,7 @@ app.use('/error', function(req, res) {
 });
 
 app.use('/main', ensureAuthenticated, function(req, res) {
+  var twitterMentions;
   var facebookResults;
   var twitterResults;
   var googleResults;
@@ -294,13 +314,22 @@ app.use('/main', ensureAuthenticated, function(req, res) {
   }
 
   if (req.session.twitter !== undefined) {
+    asyncTasks.push(function(twmentionsCallback) {
+      twFunctions.TWGetMentions(req.session.twitter._oauth2.accessToken, req.session.twitter._oauth2.tokenSecret, twmentionscall);
+
+      function twmentionscall(err, twittermentions) {
+        twitterMentions = twParser.mentionParse(twittermentions);
+        twmentionsCallback();
+      }
+    });
+
     // Push, pull TW post to async tasks
     asyncTasks.push(function(twasynccallback) {
 
       twFunctions.TWpullAllTweets(req.session.twitter._oauth2.accessToken, req.session.twitter._oauth2.tokenSecret, twcallback);
 
       function twcallback(err, twitter) {
-        twitterResults = twParser(twitter);
+        twitterResults = twParser.parse(twitter);
         userName = req.session.twitter._oauth2.name;
         twasynccallback();
       }
@@ -327,19 +356,14 @@ app.use('/main', ensureAuthenticated, function(req, res) {
       var output = combineLists.combineLists(twitterResults, facebookResults, googleResults);
 
       if (req.query['error'] !== 'undefined') {
-        res.render('main', {'errorMessage':req.query['error'], index:{test: output}, 'name':userName});
+        res.render('main', {'errorMessage':req.query['error'], index:{test: output}, 'name':userName, 'mentions':twitterMentions});
       } else {
-        res.render('main', {'errorMessage':'', index:{test: output}, 'name':userName});
+        res.render('main', {'errorMessage':'', index:{test: output}, 'name':userName, 'mentions':twitterMentions});
       }
     });
   } else {
     res.render('index');
   }
-});
-
-
-app.use('/postInfo', function(req, res) {
-  res.render('postInfo');
 });
 
 app.use('/reply', function(req, res) {

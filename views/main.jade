@@ -7,7 +7,7 @@ head
   script(type='application/javascript', src='https://ajax.googleapis.com/ajax/libs/jquery/1.11.2/jquery.min.js')
   script(type='application/javascript', src='javascript/collapse.js')
 body
-div
+div.temp
   #home
   #bundl_wrapper
     #bundl_header
@@ -16,7 +16,7 @@ div
           li
             a(href='/index')
               span
-              | Home
+              | Link Accounts
           |                 
           li
             a(href='/features')
@@ -37,8 +37,7 @@ div
       |        
       #bundl_title
         .title
-          img(src='images/bundlLogo.png', alt='BUNDLe Logo')
-             
+          include random.html
            
       #bundl_main
       .account_info
@@ -49,17 +48,14 @@ div
       
       #bundl_sidebar
        #signin_area
-          .promo_box
-            a(href ='./post')
-              img(src='./images/postButton.png', alt='Make a Post!')
-          |             
-          |            
-          .review_box
-            include ./smButtons.jade
-              br
-              br
-              br
-              br
+        a(href ='/post')
+         img(src='/images/postButton.png', alt='Make a Post!')
+        br
+        include ./smButtons.jade
+        br
+        br
+        br
+        br
       br
       |  
       section.content
@@ -68,14 +64,20 @@ div
         else
           each post, pdex in index.test
             div.holder
-              div.post  
-                |  #{post.message}
-                br
-                |  #{post.author}
-                br
-                |  #{post.updatedTimeString}
-                br
-                |  #{post.commentCount}
+              div.post
+                div.postMessage
+                  |  #{post.message}
+                  br
+                div.postAuthor    
+                  |  #{post.author}
+                  br
+                div.clear  
+                div.postbottom  
+                  div.postDate
+                    |  #{post.updatedTimeString}           
+                  div.postCommentCount
+                    |  #{post.commentCount}
+                div.clear
               div.clear
               div.subHolder
                 div.SocialMedias
@@ -98,17 +100,19 @@ div
                       img(src='/images/twitter.png', alt='facebook', width='75px')
                     if comment.socialMedia == 3
                       img(src='/images/google-plus.png', alt='facebook', width='75px')
-                  div.commentText    
-                    | #{comment.message}
+                  div.commentText
+                    div.commentMessage
+                      | #{comment.message}
+                      br
+                    div.commentAuthor
+                      | #{comment.author}
                     br
-                    | #{comment.author}
-                    br
-                    | #{comment.timeString}
-                    br
-                    //| Social Media: #{comment.socialMedia}
-                    br
-                    | LIKES: #{comment.like_count}
-                    br
+                    div.commentBottom
+                      div.commentTime
+                        | #{comment.timeString}
+                      div.commentLikeCount
+                        | LIKES: #{comment.like_count}
+                      br
                 if (comment.socialMedia == 2)
                   div.messageBox
                     form(method="post", action="/bin/processComment")
@@ -128,8 +132,25 @@ div
                     div#submit
                      input(type="submit", value="Comment On Post")
        div.content_right
-  footer
-   #bundl_footer_wrapper
-    #bundl_footer
-     | Copyright &copy; 2015 
-     a(href='/index') BUNDL
+         br
+         br
+         if(mentions !== undefined && mentions.length != 0)
+           each men in mentions
+            div.mentions
+              div.post
+                div.postMessage
+                  |#{men.message}
+                  br
+                div.postAuthor
+                  |#{men.author}
+                  br
+                div.clear  
+                div.postbottom
+                  div.postDate
+                   |#{men.updatedTimeString}
+                  div.postCommentCount
+                   |#{men.like_count}
+                div.clear 
+             div.clear     
+            br    
+  include ./footer.jade
