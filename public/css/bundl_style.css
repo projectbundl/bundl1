@@ -97,10 +97,11 @@ h6 { font-size: 14px; margin: 0 0 5px; padding: 0; }
 #bundl_wrapper {
 	margin: 0 auto;
 	padding: 0 5px;
+  height: 100%;
 }
 
 #bundl_header {
-	height: 815px;
+
 	
 }
 
@@ -211,7 +212,6 @@ h6 { font-size: 14px; margin: 0 0 5px; padding: 0; }
   float:left;
   text-align: center;
   width:100%;
-  /*width:50%;*/
 }
 
 /* content */
@@ -242,7 +242,7 @@ h6 { font-size: 14px; margin: 0 0 5px; padding: 0; }
 	border-top: 1px solid #898989;
 	background: #aeaeae;
   bottom: 0px;
-  
+  float: bottom;  
 }
 
 #bundl_footer {

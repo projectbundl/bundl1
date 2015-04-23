@@ -271,18 +271,22 @@ app.route('/post')
 
             function twcallback(err, response) {
               if (err) errorMessage += "Yo there was an error submitting your Twitter Post\n";
-              if (errorMessage == '')
+              if (errorMessage == '') {
                 res.redirect('main');
-              else
-                res.redirect('main?error=' + errorMessage);
+              } else {
+                req.session.errorMessage = errorMessage;
+                res.redirect('main');
+              }
             }
           });
         } else {
           // Check if there were errors
-          if (errorMessage == '')
+          if (errorMessage == '') {
             res.redirect('main');
-          else
-            res.redirect('main?error=' + errorMessage);
+          } else {
+            req.session.errorMessage = errorMessage;
+           res.redirect('main');
+          }
         }
       });
     }
@@ -355,8 +359,10 @@ app.use('/main', ensureAuthenticated, function(req, res) {
       // combine posts here!!
       var output = combineLists.combineLists(twitterResults, facebookResults, googleResults);
 
-      if (req.query['error'] !== 'undefined') {
-        res.render('main', {'errorMessage':req.query['error'], index:{test: output}, 'name':userName, 'mentions':twitterMentions});
+      if (req.session.errorMessage !== undefined) {
+        var tem = req.session.errorMessage;
+        req.session.errorMessage = undefined;
+        res.render('main', {'errorMessage':tem, index:{test: output}, 'name':userName, 'mentions':twitterMentions});
       } else {
         res.render('main', {'errorMessage':'', index:{test: output}, 'name':userName, 'mentions':twitterMentions});
       }

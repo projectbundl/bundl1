@@ -1,67 +1,66 @@
 doctype html
 head
   title BUNDL
-  link(href='css/reset.css', rel='stylesheet', type='text/css')
-  link(href='css/bundl_style.css', rel='stylesheet', type='text/css')
-  link(href='css/main.css', rel='stylesheet', type='text/css')
+  link(href='/css/reset.css', rel='stylesheet', type='text/css')
+  link(href='/css/bundl_style.css', rel='stylesheet', type='text/css')
+  link(href='/css/main.css', rel='stylesheet', type='text/css')
   script(type='application/javascript', src='https://ajax.googleapis.com/ajax/libs/jquery/1.11.2/jquery.min.js')
-  script(type='application/javascript', src='javascript/collapse.js')
+  script(type='application/javascript', src='/javascript/collapse.js')
 body
-div.temp
-  #home
-  #bundl_wrapper
-    #bundl_header
-      #bundl_menu
-        ul
-          li
-            a(href='/index')
-              span
-              | Link Accounts
-          |                 
-          li
-            a(href='/features')
-              span
-              | Features
-          |                 
-          li
-            a(href='/support')
-              span
-              | Support
-          |                 
-          li
-            a(href='/about')
-              span
-              | About
-      |  
-      |         
-      |        
-      #bundl_title
-        .title
-          include random.html
-           
-      #bundl_main
-      .account_info
-       |WELCOME, #{name}  
-      br
-      .logout
-       a(href='/logout') Logout! <br> 
-      
-      #bundl_sidebar
-       #signin_area
-        a(href ='/post')
-         img(src='/images/postButton.png', alt='Make a Post!')
+    div.temp
+      #home
+    #bundl_wrapper
+      #bundl_header
+        #bundl_menu
+          ul
+            li
+              a(href='/index')
+                span
+                | Link Accounts
+            |                 
+            li
+              a(href='/features')
+                span
+                | Features
+            |                 
+            li
+              a(href='/support')
+                span
+                | Support
+            |                 
+            li
+              a(href='/about')
+                span
+                | About
+        |  
+        |         
+        |        
+        #bundl_title
+          .title
+            include random.html
+             
+        #bundl_main
+        .account_info
+         |WELCOME, #{name}  
         br
-        include ./smButtons.jade
+        .logout
+         a(href='/logout') Logout! <br> 
+        
+        #bundl_sidebar
+         #signin_area
+          a(href ='/post')
+           img(src='/images/postButton.png', alt='Make a Post!')
+          br
+          include ./smButtons.jade
+          br
+          br
+          br
+          br
         br
-        br
-        br
-        br
-      br
-      |  
-      section.content
-        if (errorMessage)
-          p There was an error: #{errorMessage}
-        else
+        |  
+        section.content
+          if (errorMessage)
+            p There was an error: #{errorMessage}
           each post, pdex in index.test
             div.holder
               div.post
@@ -83,11 +82,11 @@ div.temp
                 div.SocialMedias
                   each SMNumber in post.socialMedia
                     if (SMNumber == 1)
-                       img(src='images/round/Facebook.png', alt='facebook', width='25px') 
+                       img(src='/images/round/Facebook.png', alt='facebook', width='25px') 
                     if (SMNumber == 2) 
-                       img(src='images/round/Twitter.png', alt='twitter', width='25px')
+                       img(src='/images/round/Twitter.png', alt='twitter', width='25px')
                     if (SMNumber == 3)
-                       img(src='images/round/GooglePlus.png', alt='google+', width='25px')
+                       img(src='/images/round/GooglePlus.png', alt='google+', width='25px')
                 div.Likes
                   | Likes: #{post.like_count}
               div.clear
@@ -131,26 +130,25 @@ div.temp
                     textarea(type="text",name="commentMessage", value='')
                     div#submit
                      input(type="submit", value="Comment On Post")
-       div.content_right
-         br
-         br
-         if(mentions !== undefined && mentions.length != 0)
-           each men in mentions
-            div.mentions
-              div.post
-                div.postMessage
-                  |#{men.message}
-                  br
-                div.postAuthor
-                  |#{men.author}
-                  br
-                div.clear  
-                div.postbottom
-                  div.postDate
-                   |#{men.updatedTimeString}
-                  div.postCommentCount
-                   |#{men.like_count}
-                div.clear 
-             div.clear     
-            br    
-  include ./footer.jade
+         div.content_right
+           br
+           br
+           if(mentions !== undefined && mentions.length != 0)
+             each men in mentions
+              div.mentions
+                div.post
+                  div.postMessage
+                    |#{men.message}
+                    br
+                  div.postAuthor
+                    |#{men.author}
+                    br
+                  div.clear  
+                  div.postbottom
+                    div.postDate
+                     |#{men.updatedTimeString}
+                    div.postCommentCount
+                     |#{men.like_count}
+                  div.clear 
+               div.clear     
+              br

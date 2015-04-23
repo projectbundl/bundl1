@@ -20,7 +20,6 @@ exports.TWpullAllTweets = function(accessKey, accessSecret, callback) {
   });
 
   client.get('statuses/user_timeline.json', function(error, tweets, res) {
-  //client.get('statuses/home_timeline', {count:1}, function(error, tweets, res) {
     if (error) throw error;
 
     callback(error, JSON.parse(res.body));
@@ -47,59 +46,24 @@ exports.TWtweet = function (message, accessKey, accessSecret, callback) {
 };
 
 exports.twitter_image = function(message,  file_path, accessKey, accessSecret, callback) {
-  var client = new Twitter({
+   var client = new Twitter({
     consumer_key: TWITTER_CONSUMER_KEY,
     consumer_secret: TWITTER_CONSUMER_SECRET,
     access_token_key: accessKey,
     access_token_secret: accessSecret
   });
 
-  //var b = new Buffer(fs.readFileSync(file_path.fileName.path));
-  //var s = b.toString('base64');
-  fs.readFile(file_path.fileName.path, {encoding: 'base64'}, function(err, imageB64) {
-    var form = new FormData();
-    form.append('media[]', imageB64);
-    console.log(imageB64);
-    form.append('status', message);
+  var data = fs.readFileSync(file_path.fileName.path);
 
-    form.getLength(function(err, flength) {
-      if (err) {
-        return requestCallback(err);
-      }
-      var req = request.post({url:"https://upload.twitter.com/1.1/media/upload.json", oauth: client, host: "upload.twitter.com", protocol: "https:"}, function (err, res) {
-        console.log(res);
-        //console.log(err);
+  client.post('media/upload', {media: data}, function(error, media, response) {
+      var status = { status: message, media_ids: media.media_id_string };
 
-        requestCallback(err, res);
+      client.post('statuses/update', status, function(error, tweet, response) {
+        callback(error, response);
       });
-      req._form = form;
-      req.setHeader('content-length', flength);
-
-    });
-
   });
-
-  function requestCallback(err, res, body) {
-    if (err) {
-      console.log(err);
-    } else {
-      callback();
-    }
-  }
+ 
 };
-/*
-  var form = new FormData();
-  form.append('status', message);
-  form.append('media', base64_encode(file_path.fileName.path));
-
-  var req = request.post({url:"https://upload.twitter.com/1.1/media/upload.json", oauth: client, host: "upload.twitter.com", protocol: "https:"}, twcallback);
-
-  function twcallback(err, res) {
-    console.log(res);
-    console.log(err);
-
-    callback(err, res);
-  }*/
 
 exports.TWComment = function(message, tweetID, accessKey, accessSecret, callback) {
   var client = new Twitter({

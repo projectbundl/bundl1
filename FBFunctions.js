@@ -42,8 +42,6 @@ exports.FBaddPicURL = function(mess, picURL, accessToken, callback){
   //var temp = {'message':mess, 'source':{'baseDir':__dirname + '/public/images/', 'filename':'bloggr.png', 'type':'image'} , 'no_story':true};
   graph.setAccessToken(accessToken);
   graph.post("/me/photos", temp,  function(err, res){
-    console.log(err);
-    console.log(res);
     callback(err, res);
   });
 };

@@ -31,7 +31,6 @@ module.exports = function(input, clientID, clientSecret, accessToken, retCallbac
     }
   }
   if (ctr == input.length) {
-    console.log('input', input.length);
     retCallback(messageArray);
   } 
 };

@@ -33,6 +33,7 @@ function combineList(list1, list2) {
       list1[currentl1Position].comments = list1[currentl1Position].comments.concat(list2[currentl2Position].comments);
       list1[currentl1Position].commentCount += list2[currentl2Position].commentCount;
       list1[currentl1Position].socialMedia = list1[currentl1Position].socialMedia.concat(list2[currentl2Position].socialMedia);
+      list1[currentl1Position].like_count += list2[currentl2Position].like_count;
       
       output.push(list1[currentl1Position]);
       currentl1Position++;
