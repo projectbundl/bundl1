@@ -7,7 +7,7 @@ var request = require('request');
 exports.FBpostToFeedMessageAccessToken = function (mess, link, accessToken, callback) {
   graph.setAccessToken(accessToken);
   var temp;
-  if (link) {
+  if (link !== undefined) {
     temp = {'message':mess, 'picture':link};
   } else {
     temp = {'message':mess};
@@ -35,11 +35,9 @@ exports.FBaddPicURL = function(mess, picURL, accessToken, callback){
   form.append('message', mess);
   form.append('source', fs.createReadStream(__dirname + '/public/images/bloggr.png'));
 */
+console.log(picURL);
 
- 
-  var temp1 = '@' + __dirname + '/public/images/bloggr.png';
-  var temp = {'message':mess, link:"https://babbage.hbg.psu.edu:6395/images/bloggr.png"};
-  //var temp = {'message':mess, 'source':{'baseDir':__dirname + '/public/images/', 'filename':'bloggr.png', 'type':'image'} , 'no_story':true};
+  var temp = {'message':mess, link:picURL};
   graph.setAccessToken(accessToken);
   graph.post("/me/photos", temp,  function(err, res){
     callback(err, res);
@@ -66,6 +64,7 @@ exports.FBcommentToPost = function (message, postID, token, callback) {
 exports.FBGetCommentURL = function(commentID, token, callback) {
   graph.setAccessToken(token);
   graph.get('/' + commentID, function(err, res) {
+    console.log(res);
     callback(err, res);
   });
 };

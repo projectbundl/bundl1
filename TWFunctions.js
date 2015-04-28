@@ -81,7 +81,7 @@ exports.TWComment = function(message, tweetID, accessKey, accessSecret, callback
 
 exports.TWtrunk = function(message, url, hollerback){
   Tiny.shorten(url, function(err, TheURL){
-    var truncateLength = 140 - TheURL.length + 4 ;
+    var truncateLength = 140 - TheURL.length - 4 ;
 
     message = message.substring(0,truncateLength);
     message += "... ";
