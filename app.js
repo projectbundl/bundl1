@@ -219,54 +219,134 @@ app.route('/post')
           errorMessage += "Yo you do not have access to post to Facebook!";
         }
       }
-      
-      if (selection.indexOf('0') > -1 || selection.indexOf('2') > -1) {
-        if (req.session.twitter !== undefined) {
-          if (postMessage.length <= 140 || asyncSubmitPosts.length == 0) {
-            if (Object.getOwnPropertyNames(req.files).length !== 0) {
-              asyncSubmitPosts.push(function(twAsyncCallback) {
+
+      if (asyncSubmitPosts.length === 0) {
+        if (selection.indexOf('0') > -1 || selection.indexOf('2') > -1) {
+          if (req.session.twitter !== undefined) {
+            if (postMessage.length <= 140) {
+              if (Object.getOwnPropertyNames(req.files).length !== 0) {
                 twFunctions.twitter_image(postMessage, req.files, req.session.twitter._oauth2.accessToken, req.session.twitter._oauth2.tokenSecret, twcallback);
                 function twcallback(err, response) {
                   if (err) errorMessage += "Yo there was an error uploading your image to Twitter\n";
-                  twAsyncCallback();
+                  if (errorMessage == '') {
+                    res.redirect('main');
+                  } else {
+                    req.session.errorMessage = errorMessage;
+                    res.redirect('main');
+                  }
                 }
-              });
-            } else {
-              asyncSubmitPosts.push(function(twAsyncCallback) {
-                // Submit post to Twitter
+              } else {
                 twFunctions.TWtweet(postMessage, req.session.twitter._oauth2.accessToken, req.session.twitter._oauth2.tokenSecret, twcallback);
-
                 function twcallback(err, response) {
                   if (err) errorMessage += "Yo there was an error submitting your Twitter Post\n";
-                  twAsyncCallback();
+                  if (errorMessage == '') {
+                    res.redirect('main');
+                  } else {
+                    req.session.errorMessage = errorMessage;
+                    res.redirect('main');
+                  }
                 }
-              });
-            }
-          }
-        } else {
-          // unauthorized
-          errorMessage += "Yo you do not have access to post to Twitter!\n";
-        }
-      }
-
-      async.parallel(asyncSubmitPosts, function(url) {
-        if (postMessage.length > 140) {
-          if (url === undefined) {
-            twFunctions.TWtrunk(postMessage, undefined, hollerback);
-          } else {
-            twFunctions.TWtrunk(postMessage, url.actions[0].link, hollerback);
-          }
-          function hollerback(totalMessage) {
-            if (Object.getOwnPropertyNames(req.files).length !== 0) {
-              console.log('totalmessage', totalMessage.length);
-              twFunctions.twitter_image(totalMessage, req.files, req.session.twitter._oauth2.accessToken, req.session.twitter._oauth2.tokenSecret, twcallback);
+              }
             } else {
-              twFunctions.TWtweet(totalMessage, req.session.twitter._oauth2.accessToken, req.session.twitter._oauth2.tokenSecret, twcallback);
+              if (Object.getOwnPropertyNames(req.files).length !== 0) {
+                twFunctions.twitter_image(postMessage, req.files, req.session.twitter._oauth2.accessToken, req.session.twitter._oauth2.tokenSecret, twcallback);
+                function twcallback(err, response) {
+                  if (err) errorMessage += "Yo there was an error uploading your image to Twitter\n";
+                  if (errorMessage == '') {
+                    res.redirect('main');
+                  } else {
+                    req.session.errorMessage = errorMessage;
+                    res.redirect('main');
+                  }
+                }
+              } else {
+                twFunctions.TWtweet(postMessage, req.session.twitter._oauth2.accessToken, req.session.twitter._oauth2.tokenSecret, twcallback);
+                function twcallback(err, response) {
+                  if (err) errorMessage += "Yo there was an error submitting your Twitter Post\n";
+                  if (errorMessage == '') {
+                    res.redirect('main');
+                  } else {
+                    req.session.errorMessage = errorMessage;
+                    res.redirect('main');
+                  }
+                }
+              }
             }
-
-            function twcallback(err, response) {
-              console.log(err);
-              if (err) errorMessage += "Yo there was an error submitting your Twitter Post with trunking message\n";
+          } else {
+            errorMessage = "Yo you do not have access to post to Twitter!\n";
+            req.session.errorMessage = errorMessage;
+            res.redirect('main');
+          }
+        }
+      } else {
+        async.parallel(asyncSubmitPosts, function(url) {
+          if (postMessage.length > 140) {
+            if (selection.indexOf('0') > -1 || selection.indexOf('2') > -1) {
+              if (Object.getOwnPropertyNames(req.files).length !== 0) {
+// Error potential
+                twFunctions.TWtrunk(postMessage, url.actions[0].link, hollerback);
+                function hollerback(totalMessage) {
+                  twFunctions.twitter_image(totalMessage, req.files, req.session.twitter._oauth2.accessToken, req.session.twitter._oauth2.tokenSecret, twcallback);
+                  function twcallback(err, response) {
+                    if (err) errorMessage += "Yo there was an error uploading your image to Twitter\n";
+                    if (errorMessage == '') {
+                      res.redirect('main');
+                    } else {
+                      req.session.errorMessage = errorMessage;
+                      res.redirect('main');
+                    }
+                  }
+                }
+              } else {
+                twFunctions.TWtrunk(postMessage, url.actions[0].link, hollerback);
+                function hollerback(totalMessage) {
+                  twFunctions.TWtweet(totalMessage, req.session.twitter._oauth2.accessToken, req.session.twitter._oauth2.tokenSecret, twcallback);
+                  function twcallback(err, response) {
+                    if (err) errorMessage += "Yo there was an error submitting your Twitter Post\n";
+                    if (errorMessage == '') {
+                      res.redirect('main');
+                    } else {
+                      req.session.errorMessage = errorMessage;
+                      res.redirect('main');
+                    }
+                  }
+                }
+              }
+            } else {
+              if (errorMessage == '') {
+                res.redirect('main');
+              } else {
+                req.session.errorMessage = errorMessage;
+                res.redirect('main');
+              }
+            }
+          } else {
+            if (selection.indexOf('0') > -1 || selection.indexOf('2') > -1) {
+              if (Object.getOwnPropertyNames(req.files).length !== 0) {
+// Error potential
+                twFunctions.twitter_image(postMessage, req.files, req.session.twitter._oauth2.accessToken, req.session.twitter._oauth2.tokenSecret, twcallback);
+                function twcallback(err, response) {
+                  if (err) errorMessage += "Yo there was an error uploading your image to Twitter\n";
+                  if (errorMessage == '') {
+                    res.redirect('main');
+                  } else {
+                    req.session.errorMessage = errorMessage;
+                    res.redirect('main');
+                  }
+                }
+              } else {
+                twFunctions.TWtweet(postMessage, req.session.twitter._oauth2.accessToken, req.session.twitter._oauth2.tokenSecret, twcallback);
+                function twcallback(err, response) {
+                  if (err) errorMessage += "Yo there was an error submitting your Twitter Post\n";
+                  if (errorMessage == '') {
+                    res.redirect('main');
+                  } else {
+                    req.session.errorMessage = errorMessage;
+                    res.redirect('main');
+                  }
+                }
+              }
+            } else {
               if (errorMessage == '') {
                 res.redirect('main');
               } else {
@@ -275,16 +355,8 @@ app.route('/post')
               }
             }
           }
-        } else {
-          // Check if there were errors
-          if (errorMessage == '') {
-            res.redirect('main');
-          } else {
-            req.session.errorMessage = errorMessage;
-           res.redirect('main');
-          }
-        }
-      });
+        });
+      }
     }
   });
 
