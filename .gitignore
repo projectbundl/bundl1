@@ -5,6 +5,6 @@
 /cert_files/*
 /public/uploads
 /nohup.out
-/node_modules
+node_modules/*
 *~
 *.swp
