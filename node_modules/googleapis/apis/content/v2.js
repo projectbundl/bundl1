@@ -282,6 +282,7 @@ function Content(options) {
      * @memberOf! content(v2)
      *
      * @param  {object} params - Parameters for request
+     * @param  {boolean=} params.dryRun - Flag to run the request in dry-run mode.
      * @param  {object} params.resource - Request body data
      * @param  {callback} callback - The callback that handles the response.
      * @return {object} Request object
@@ -370,6 +371,7 @@ function Content(options) {
      *
      * @param  {object} params - Parameters for request
      * @param  {string} params.accountId - The ID of the account for which to get/update account shipping settings.
+     * @param  {boolean=} params.dryRun - Flag to run the request in dry-run mode.
      * @param  {string} params.merchantId - The ID of the managing account.
      * @param  {object} params.resource - Request body data
      * @param  {callback} callback - The callback that handles the response.
@@ -400,6 +402,7 @@ function Content(options) {
      *
      * @param  {object} params - Parameters for request
      * @param  {string} params.accountId - The ID of the account for which to get/update account shipping settings.
+     * @param  {boolean=} params.dryRun - Flag to run the request in dry-run mode.
      * @param  {string} params.merchantId - The ID of the managing account.
      * @param  {object} params.resource - Request body data
      * @param  {callback} callback - The callback that handles the response.
@@ -427,7 +430,7 @@ function Content(options) {
     /**
      * content.accountstatuses.custombatch
      *
-     *
+     * 
      *
      * @alias content.accountstatuses.custombatch
      * @memberOf! content(v2)
@@ -524,6 +527,7 @@ function Content(options) {
      * @memberOf! content(v2)
      *
      * @param  {object} params - Parameters for request
+     * @param  {boolean=} params.dryRun - Flag to run the request in dry-run mode.
      * @param  {object} params.resource - Request body data
      * @param  {callback} callback - The callback that handles the response.
      * @return {object} Request object
@@ -612,6 +616,7 @@ function Content(options) {
      *
      * @param  {object} params - Parameters for request
      * @param  {string} params.accountId - The ID of the account for which to get/update account tax settings.
+     * @param  {boolean=} params.dryRun - Flag to run the request in dry-run mode.
      * @param  {string} params.merchantId - The ID of the managing account.
      * @param  {object} params.resource - Request body data
      * @param  {callback} callback - The callback that handles the response.
@@ -642,6 +647,7 @@ function Content(options) {
      *
      * @param  {object} params - Parameters for request
      * @param  {string} params.accountId - The ID of the account for which to get/update account tax settings.
+     * @param  {boolean=} params.dryRun - Flag to run the request in dry-run mode.
      * @param  {string} params.merchantId - The ID of the managing account.
      * @param  {object} params.resource - Request body data
      * @param  {callback} callback - The callback that handles the response.
@@ -669,7 +675,7 @@ function Content(options) {
     /**
      * content.datafeeds.custombatch
      *
-     *
+     * 
      *
      * @alias content.datafeeds.custombatch
      * @memberOf! content(v2)
@@ -703,8 +709,8 @@ function Content(options) {
      * @memberOf! content(v2)
      *
      * @param  {object} params - Parameters for request
-     * @param  {string} params.datafeedId -
-     * @param  {string} params.merchantId -
+     * @param  {string} params.datafeedId - 
+     * @param  {string} params.merchantId - 
      * @param  {callback} callback - The callback that handles the response.
      * @return {object} Request object
      */
@@ -732,8 +738,8 @@ function Content(options) {
      * @memberOf! content(v2)
      *
      * @param  {object} params - Parameters for request
-     * @param  {string} params.datafeedId -
-     * @param  {string} params.merchantId -
+     * @param  {string} params.datafeedId - 
+     * @param  {string} params.merchantId - 
      * @param  {callback} callback - The callback that handles the response.
      * @return {object} Request object
      */
@@ -761,7 +767,7 @@ function Content(options) {
      * @memberOf! content(v2)
      *
      * @param  {object} params - Parameters for request
-     * @param  {string} params.merchantId -
+     * @param  {string} params.merchantId - 
      * @param  {object} params.resource - Request body data
      * @param  {callback} callback - The callback that handles the response.
      * @return {object} Request object
@@ -820,8 +826,8 @@ function Content(options) {
      * @memberOf! content(v2)
      *
      * @param  {object} params - Parameters for request
-     * @param  {string} params.datafeedId -
-     * @param  {string} params.merchantId -
+     * @param  {string} params.datafeedId - 
+     * @param  {string} params.merchantId - 
      * @param  {object} params.resource - Request body data
      * @param  {callback} callback - The callback that handles the response.
      * @return {object} Request object
@@ -850,8 +856,8 @@ function Content(options) {
      * @memberOf! content(v2)
      *
      * @param  {object} params - Parameters for request
-     * @param  {string} params.datafeedId -
-     * @param  {string} params.merchantId -
+     * @param  {string} params.datafeedId - 
+     * @param  {string} params.merchantId - 
      * @param  {object} params.resource - Request body data
      * @param  {callback} callback - The callback that handles the response.
      * @return {object} Request object
@@ -878,7 +884,7 @@ function Content(options) {
     /**
      * content.datafeedstatuses.custombatch
      *
-     *
+     * 
      *
      * @alias content.datafeedstatuses.custombatch
      * @memberOf! content(v2)
@@ -912,8 +918,8 @@ function Content(options) {
      * @memberOf! content(v2)
      *
      * @param  {object} params - Parameters for request
-     * @param  {string} params.datafeedId -
-     * @param  {string} params.merchantId -
+     * @param  {string} params.datafeedId - 
+     * @param  {string} params.merchantId - 
      * @param  {callback} callback - The callback that handles the response.
      * @return {object} Request object
      */

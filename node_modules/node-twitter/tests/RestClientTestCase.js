@@ -215,4 +215,42 @@ RestClientTestCase.prototype.testStatusesUpdateWithMedia = function()
     });
 };
 
+
+RestClientTestCase.prototype.testFriendsIds = function()
+{
+    this._twitterRestClient.friendsIds({}, function(error, result) {
+        assert.ifError(error);
+        assert.deepEqual(typeof(result), 'object');
+    });
+};
+
+RestClientTestCase.prototype.testFriendsList = function()
+{
+    this._twitterRestClient.friendsList({'count':20,'cursor':'-1'}, function(error, result) {
+        assert.ifError(error);
+        assert.deepEqual(typeof(result), 'object');
+    });
+};
+
+RestClientTestCase.prototype.testUsersLookup = function()
+{
+    this._twitterRestClient.usersLookup({'user_id':'783214,6253282'}, function(error, result) {
+        assert.ifError(error);
+        assert.deepEqual(typeof(result), 'object');
+    });
+    this._twitterRestClient.usersLookup({'screen_name':'twitterapi,twitter'}, function(error, result) {
+        assert.ifError(error);
+        assert.deepEqual(typeof(result), 'object');
+    });
+};
+
+RestClientTestCase.prototype.testApplicationRateLimitStatus = function()
+{
+    this._twitterRestClient.applicationRateLimitStatus({}, function(error, result) {
+        assert.ifError(error);
+        assert.deepEqual(typeof(result), 'object');
+    });
+};
+
+
 module.exports = RestClientTestCase;

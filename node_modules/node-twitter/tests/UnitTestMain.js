@@ -2,10 +2,10 @@ var RestClientTestCase = require('./RestClientTestCase');
 var SearchClientTestCase = require('./SearchClientTestCase');
 
 var oAuthCredentials = {
-    consumerKey: 'CONSUMER_KEY',
-    consumerSecret: 'CONSUMER_SECRET',
-    token: 'TOKEN',
-    tokenSecret: 'TOKEN_SECRET'
+    consumerKey: process.env.TWITTER_CONSUMER_KEY,//'CONSUMER_KEY',
+    consumerSecret: process.env.TWITTER_CONSUMER_SECRET,//'CONSUMER_SECRET',
+    token: process.env.TWITTER_ACCESS_TOKEN_KEY,//'TOKEN',
+    tokenSecret: process.env.TWITTER_ACCESS_TOKEN_SECRET//'TOKEN_SECRET'
 };
 
 // REST API
@@ -102,6 +102,26 @@ setTimeout(function() {
     restClientTestCase.testStatusesUpdateWithMedia();
 }, 32000);
 
+setTimeout(function() {
+    console.log('RestClient.testFriendsIds');
+    restClientTestCase.testFriendsIds();
+},34000);
+
+setTimeout(function() {
+    console.log('RestClient.testFriendsList');
+    restClientTestCase.testFriendsList();
+},36000);
+
+setTimeout(function() {
+    console.log('RestClient.testUsersLookup'); 
+    restClientTestCase.testUsersLookup();
+},38000);
+
+setTimeout(function() {
+    console.log('RestClient.testApplicationRateLimitStatus'); 
+    restClientTestCase.testApplicationRateLimitStatus();
+},40000);
+
 // Search API
 
 var searchClientTestCase = new SearchClientTestCase(oAuthCredentials);
@@ -112,6 +132,4 @@ searchClientTestCase.testCreate();
 setTimeout(function() {
     console.log('SearchClient.testSearch');
     searchClientTestCase.testSearch();
-}, 34000);
-
-
+}, 42000);

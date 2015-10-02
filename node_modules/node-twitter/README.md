@@ -132,3 +132,7 @@ To run the unit tests, open tests/UnitTestMain.js in a text editor and replace t
 Save the file then, from the command line, run:
 
     make test
+
+# Contributing
+
+Before submitting pull requests, please ensure your code is documented and there are unit tests for any new functionality.

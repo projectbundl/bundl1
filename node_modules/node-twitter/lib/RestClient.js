@@ -117,6 +117,49 @@ RestClient.prototype.directMessagesNew = function(parameters, callback)
 
 // Friends & Followers
 
+
+/**
+ * Returns an array of numeric IDs for every user friend of the specified user.
+ *
+ * For information on acceptable parameters see the official <a href="https://dev.twitter.com/docs/api/1/get/friends/ids">Twitter documenation</a>.
+ *
+ * @this {RestClient}
+ * @param parameters
+ * @param callback The callback function.
+ */
+RestClient.prototype.friendsIds = function(parameters, callback)
+{
+    this._validator.validateScreenName(parameters);
+    this._validator.validateUserId(parameters);
+
+    // To work around JavaScript's inability to handle large numbers 
+    // indicate IDs should be returned as strings
+    parameters['stringify_ids'] = true;
+
+    this._createGetRequest('friends/ids', this._format, parameters, callback);
+}
+
+/**
+ * Returns a cursored collection of user objects for every user the specified user is following (otherwise known as their “friends”).
+ *
+ * For information on acceptable parameters see the official <a href="https://dev.twitter.com/docs/api/1/get/friends/list">Twitter documenation</a>.
+ *
+ * @this {RestClient}
+ * @param parameters
+ * @param callback The callback function.
+ */
+RestClient.prototype.friendsList = function(parameters, callback)
+{
+    this._validator.validateScreenName(parameters);
+    this._validator.validateUserId(parameters);
+
+    // To work around JavaScript's inability to handle large numbers 
+    // indicate IDs should be returned as strings
+    parameters['stringify_ids'] = true;
+
+    this._createGetRequest('friends/list', this._format, parameters, callback);
+}
+
 /**
  * Returns an array of numeric IDs for every user following the specified user.
  *
@@ -673,5 +716,22 @@ RestClient.prototype.usersLookup = function(parameters, callback)
 
     this._createGetRequest('users/lookup', this._format, parameters, callback);
 }
+
+// Application
+
+/**
+ * Returns the current rate limits for methods belonging to the specified resource families.
+ *
+ * For information on acceptable parameters see the official <a href="https://dev.twitter.com/rest/reference/get/application/rate_limit_status">Twitter documenation</a>.
+ *
+ * @this {RestClient}
+ * @param parameters - resources (optional) A comma-separated list of resource families you want to know the current rate limit disposition for. For best performance, only specify the resource families pertinent to your application.  Example Values: statuses,friends,trends,help
+ * @param callback The callback function.
+ */
+RestClient.prototype.applicationRateLimitStatus = function(parameters, callback)
+{
+    this._createGetRequest('application/rate_limit_status', this._format, parameters, callback);
+}
+
 
 module.exports = RestClient;
