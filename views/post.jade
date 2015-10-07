@@ -1,44 +1,7 @@
-doctype html
-head
-  title BUNDL
-  link(href='/css/reset.css', rel='stylesheet', type='text/css')
-  link(href='/css/bundl_style.css', rel='stylesheet', type='text/css')
-  link(href='/css/main.css', rel='stylesheet', type='text/css')
-  script(type='application/javascript', src='https://ajax.googleapis.com/ajax/libs/jquery/1.11.2/jquery.min.js')
-  script(type='application/javascript', src='/javascript/postPage.js')
-body
-div.temp
-  #home
-  #bundl_wrapper
-    #bundl_header
-      #bundl_menu
-        ul
-          li
-            a(href='/index')
-              span
-              | Link Accounts
-          |                 
-          li
-            a(href='/features')
-              span
-              | Features
-          |                 
-          li
-            a(href='/support')
-              span
-              | Support
-          |                 
-          li
-            a(href='/about')
-              span
-              | About
-      |  
-      |         
-      |         
+include ./header.jade      
       #bundl_title
         .title
          include random.html 
-       
        
        #bundl_main
        .account_info
@@ -80,9 +43,4 @@ div.temp
           div#submit
             input(type='submit', value='Post!')
        div.content_right   
-footer.temp
-#bundl_index
- #bundl_footer_wrapper
-   #bundl_footer
-     | Copyright &copy; 2015 
-     a(href='/index') BUNDL
+include ./footer.jade
