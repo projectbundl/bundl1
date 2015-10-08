@@ -7,11 +7,20 @@ var bodyParser = require('body-parser')
   , config = require('config')
   , errorHandler = require('errorhandler')
   , express = require('express')
-  , methodOverride = require('method-override')
-  , post = require('./routes/post')
-  , routes = require('./routes');
+  , methodOverride = require('method-override');
 
 var app = express();
+var router = express.Router()
+
+/**
+ * Define routes
+ */
+var about = require('./routes/about')
+  , features = require('./routes/features')
+  , post = require('./routes/post')
+  , reply = require('./routes/reply')
+  , routes = require('./routes')
+  , support = require('./routes/support');
 
 
 // Configuration
@@ -25,9 +34,27 @@ app.use(errorHandler(config.get('errorHandlerOptions')));
 
 
 // Routes
+// TODO: rework to log all requests here
+router.use(function timeLog(req, res, next) {
+  console.log('Hit ', req, ' at Time: ', Date.now());
+  next();
+});
 app.get('/', routes.index);
+app.get('/about', about);
+app.get('/error')
+app.get('/features', features);
+app.get('/logout', routes.index, function(req, res){
+  // TODO: Pull out to function and only process 
+  // for enabled media sites
+  delete(req.session.twitter);
+  delete(req.session.google);
+  delete(req.session.facebook);
+  req.session.destroy();
+  req.logOut();
+})
 app.get('/post', post);
-
+app.get('/reply', reply);
+app.get('/support', support);
 
 // Run server
 // can use NODE_ENV="development" nodejs app.js

@@ -11,8 +11,8 @@ router.use(function timeLog(req, res, next) {
 });
 
 // define the home page route
-router.get('/post', function(req, res) {
-  res.render('post')
+router.get('/features', function(req, res) {
+  res.render('features')
 });
 
 module.exports = router;

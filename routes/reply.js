@@ -11,8 +11,10 @@ router.use(function timeLog(req, res, next) {
 });
 
 // define the home page route
-router.get('/post', function(req, res) {
-  res.render('post')
+router.get('/reply', function(req, res) {
+  res.render('reply')
 });
+
+// TODO: process reply for authorized sites
 
 module.exports = router;
