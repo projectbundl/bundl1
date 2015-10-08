@@ -1,0 +1,5 @@
+{
+  "mode": "development",
+  "port": 3000,
+  "errorHandlerOptions": {"dumpExceptions": true, "showStack": true}
+}

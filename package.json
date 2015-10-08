@@ -6,9 +6,11 @@
   "email": "messinger.craig@gmail.com",
   "dependencies": {
     "body-parser": "~1.14.1",
+    "compression": "~1.6.0",
+    "config": "~1.16.0",
     "errorhandler": "~1.4.2",
     "express": "*",
-    "compression": "~1.6.0",
+    "jade": "~1.11.0",
     "method-override": "~2.3.5"
   }
 }

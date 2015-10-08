@@ -4,6 +4,7 @@
 
 var bodyParser = require('body-parser')
   , compression = require('compression')
+  , config = require('config')
   , errorHandler = require('errorhandler')
   , express = require('express')
   , methodOverride = require('method-override')
@@ -20,16 +21,17 @@ app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json())
 app.use(methodOverride());
 app.use(express.static(__dirname + '/public'));
-
-if ('development' == app.get('env')) {
-	app.use(errorHandler());
-}
+app.use(errorHandler(config.get('errorHandlerOptions'))); 
 
 
 // Routes
 app.get('/', routes.index);
-//app.get('/post', routes.post);
+app.get('/post', post);
 
-app.listen(3000, function(){
-  console.log("Express server listening on port 3000 in mode");
+
+// Run server
+// can use NODE_ENV="development" nodejs app.js
+// to run in dev
+app.listen(config.port, function(){
+  console.log("Express server listening on port %s in mode %s", config.get('port'), config.get('mode'));
 });
