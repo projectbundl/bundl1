@@ -1,7 +1,6 @@
-/creds
-/cert.pem
-/csr.pem
-/key.pem
-/cert_files/*
 /public/uploads
 /nohup.out
+node_modules/*
+*~
+*.swp
+.settings
