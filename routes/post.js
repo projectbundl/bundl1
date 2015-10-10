@@ -1,18 +1,23 @@
 /**
- * http://usejsdoc.org/
+ * Route for post page
  */
 
 var express = require('express');
-var router = express.Router();
 
-router.use(function timeLog(req, res, next) {
-  console.log('Hit ', req.url, ' at Time: ', Date.now());
-  next();
-});
-
-// define the home page route
-router.get('/post', function(req, res) {
-  res.render('post')
-});
-
-module.exports = router;
+module.exports = (function() {
+	'use strict';
+	var router = express.Router();
+	
+	router.use(function timeLog(req, res, next) {
+	  console.log('Hit ', req.url, ' at Time: ', Date.now());
+	  next();
+	});
+	
+	// TODO: process for authorized sites
+	// define the home page route
+	router.get('/', function(req, res) {
+	  res.render('post')
+	});
+	
+	return router;
+})();

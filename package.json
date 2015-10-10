@@ -11,6 +11,7 @@
     "errorhandler": "~1.4.2",
     "express": "*",
     "jade": "~1.11.0",
-    "method-override": "~2.3.5"
+    "method-override": "~2.3.5",
+    "morgan": "~1.6.1"
   }
 }

@@ -1,64 +1,48 @@
 /**
  * Module dependencies.
  */
-
 var bodyParser = require('body-parser')
   , compression = require('compression')
   , config = require('config')
   , errorHandler = require('errorhandler')
   , express = require('express')
-  , methodOverride = require('method-override');
-
-var app = express();
-var router = express.Router()
+  , methodOverride = require('method-override')
+  , morgan = require('morgan')
+  , app = express();
 
 /**
  * Define routes
  */
-var about = require('./routes/about')
-  , features = require('./routes/features')
+var logout = require('./routes/logout')
   , post = require('./routes/post')
-  , reply = require('./routes/reply')
-  , routes = require('./routes')
-  , support = require('./routes/support');
+//  , reply = require('./routes/reply')
+  , staticPages = require('./routes/staticPages');
 
-
-// Configuration
+/**
+ * Configure application
+ */
 app.set('views', __dirname + '/views');
 app.set('view engine', 'jade');
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json())
 app.use(methodOverride());
 app.use(express.static(__dirname + '/public'));
+app.use(morgan('short'));
 app.use(errorHandler(config.get('errorHandlerOptions'))); 
 
+/**
+ * Apply routes to application
+ */
 
-// Routes
-// TODO: rework to log all requests here
-router.use(function timeLog(req, res, next) {
-  console.log('Hit ', req, ' at Time: ', Date.now());
-  next();
-});
-app.get('/', routes.index);
-app.get('/about', about);
-app.get('/error')
-app.get('/features', features);
-app.get('/logout', routes.index, function(req, res){
-  // TODO: Pull out to function and only process 
-  // for enabled media sites
-  delete(req.session.twitter);
-  delete(req.session.google);
-  delete(req.session.facebook);
-  req.session.destroy();
-  req.logOut();
-})
-app.get('/post', post);
-app.get('/reply', reply);
-app.get('/support', support);
+app.use('/post', post);
+//app.use('/reply', reply);
+app.use('/logout', logout);
+app.use('/', staticPages);
 
-// Run server
-// can use NODE_ENV="development" nodejs app.js
-// to run in dev
+/**
+ * Start application
+ * Can use NODE_ENV="development" nodejs app.js to run in dev
+ */
 app.listen(config.port, function(){
   console.log("Express server listening on port %s in mode %s", config.get('port'), config.get('mode'));
 });

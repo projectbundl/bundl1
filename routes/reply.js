@@ -1,20 +1,22 @@
 /**
- * http://usejsdoc.org/
+ * Route for reply page
  */
 
 var express = require('express');
-var router = express.Router();
 
-router.use(function timeLog(req, res, next) {
-  console.log('Hit ', req.url, ' at Time: ', Date.now());
-  next();
-});
-
-// define the home page route
-router.get('/reply', function(req, res) {
-  res.render('reply')
-});
-
-// TODO: process reply for authorized sites
-
-module.exports = router;
+module.exports = (function() {
+	'use strict';
+	var router = express.Router();
+	
+	router.use(function(req, res, next) {
+		console.log('Hit ', req.url, ' at Time: ', Date.now());
+		next();
+	});
+	
+	// TODO: process reply for authorized sites
+	router.get('/', function(req, res) {
+		res.render('reply');
+	});
+	
+	return router;
+})();
