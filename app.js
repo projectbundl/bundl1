@@ -44,5 +44,5 @@ app.use('/', staticPages);
  * Can use NODE_ENV="development" nodejs app.js to run in dev
  */
 app.listen(config.port, function(){
-  console.log("Express server listening on port %s in mode %s", config.get('port'), config.get('mode'));
+  console.log("Express server listening on port %s in mode %s", process.env.PORT, config.get('mode'));
 });
