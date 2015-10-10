@@ -1,37 +1,48 @@
 /**
  * Module dependencies.
  */
-
 var bodyParser = require('body-parser')
   , compression = require('compression')
   , config = require('config')
   , errorHandler = require('errorhandler')
   , express = require('express')
   , methodOverride = require('method-override')
+  , morgan = require('morgan')
+  , app = express();
+
+/**
+ * Define routes
+ */
+var logout = require('./routes/logout')
   , post = require('./routes/post')
-  , routes = require('./routes');
+//  , reply = require('./routes/reply')
+  , staticPages = require('./routes/staticPages');
 
-var app = express();
-
-
-// Configuration
+/**
+ * Configure application
+ */
 app.set('views', __dirname + '/views');
 app.set('view engine', 'jade');
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json())
 app.use(methodOverride());
 app.use(express.static(__dirname + '/public'));
+app.use(morgan('short'));
 app.use(errorHandler(config.get('errorHandlerOptions'))); 
 
+/**
+ * Apply routes to application
+ */
 
-// Routes
-app.get('/', routes.index);
-app.get('/post', post);
+app.use('/post', post);
+//app.use('/reply', reply);
+app.use('/logout', logout);
+app.use('/', staticPages);
 
-
-// Run server
-// can use NODE_ENV="development" nodejs app.js
-// to run in dev
+/**
+ * Start application
+ * Can use NODE_ENV="development" nodejs app.js to run in dev
+ */
 app.listen(config.port, function(){
   console.log("Express server listening on port %s in mode %s", config.get('port'), config.get('mode'));
 });
