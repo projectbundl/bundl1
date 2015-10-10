@@ -15,6 +15,6 @@
     "morgan": "~1.6.1"
   },
   "scripts": {
-	"start": "nodejs app.js"
+	"start": "node app.js"
   }
 }
