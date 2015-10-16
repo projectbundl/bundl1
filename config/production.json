@@ -1,5 +1,4 @@
 {
-  "mode": "production"
-  "port": 3000,
+  "mode": "production",
   "errorHandlerOptions": {"dumpExceptions": false, "showStack": false}
 }

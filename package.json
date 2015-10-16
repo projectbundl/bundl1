@@ -5,13 +5,27 @@
   "author": "Craig Messinger",
   "email": "messinger.craig@gmail.com",
   "dependencies": {
-    "body-parser": "~1.14.1",
-    "compression": "~1.6.0",
-    "config": "~1.16.0",
-    "errorhandler": "~1.4.2",
+    "body-parser": "1.14.x",
+    "compression": "1.6.x",
+    "config": "1.16.x",
+    "errorhandler": "1.4.x",
     "express": "*",
-    "jade": "~1.11.0",
-    "method-override": "~2.3.5",
-    "morgan": "~1.6.1"
+    "jade": "1.11.x",
+    "method-override": "2.3.x",
+    "morgan": "1.6.x",
+    "passport": "~0.3.0",
+    "passport-facebook": "~2.0.0"
+  },
+  "devDependencies": {
+    "should": "*",
+    "assert": "*",
+    "supertest": "*"
+  },
+  "scripts": {
+    "start": "node app.js",
+    "test": "make test"
+  },
+  "engines": {
+    "node": "0.10.25"
   }
 }
