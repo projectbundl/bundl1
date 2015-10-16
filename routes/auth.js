@@ -14,6 +14,6 @@ module.exports(function() {
 	//  request.  The first step in Facebook authentication will involve
 	//  redirecting the user to facebook.com.  After authorization, Facebook will
 	//  redirect the user back to this application at /auth/facebook/callback
-	app.get('/facebook', 
+	app.get('/facebook',
 	  passport.authenticate('facebook'));
 })();
