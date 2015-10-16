@@ -80,6 +80,12 @@ passport.use(new facebookStrategy({
 app.get('/auth/facebook/callback', 
 		  passport.authenticate('facebook', { successRedirect: '/main', failureRedirect:'/' }));
 
+//GET /auth/facebook
+//Use passport.authenticate() as route middleware to authenticate the
+//request.  The first step in Facebook authentication will involve
+//redirecting the user to facebook.com.  After authorization, Facebook will
+//redirect the user back to this application at /auth/facebook/callback
+app.get('/auth/facebook', passport.authenticate('facebook'), function (req, res) {});
 
 /**
  * Apply routes to application
@@ -90,6 +96,17 @@ app.use('/post', post);
 app.use('/main', main);
 app.use('/logout', logout);
 app.use('/', staticPages);
+
+
+//Simple route middleware to ensure user is authenticated.
+//Use this route middleware on any resource that needs to be protected.  If
+//the request is authenticated (typically via a persistent login session),
+//the request will proceed.  Otherwise, the user will be redirected to the
+//login page.
+function ensureAuthenticated(req, res, next) {
+if (req.isAuthenticated()) { return next(); }
+res.redirect('error')
+}
 
 /**
  * Start application
